@@ -1,6 +1,6 @@
 """
 Google Drive Sync for cyp-krg (Crypto / DeFi / Web3 Reels)
-Syncs HTML animations (with Web Audio SFX) and background music from Google Drive using Service Account.
+Syncs HTML animations (with native Web Audio SFX) from Google Drive using Service Account.
 """
 
 import os
@@ -26,11 +26,9 @@ load_dotenv(dotenv_path=env_path)
 
 BASE_DIR = Path(__file__).resolve().parent
 HTML_DIR = BASE_DIR / "html_sources"
-MUSIC_DIR = BASE_DIR / "music"
 
-# Default Google Drive Folder IDs
+# Default Google Drive Folder ID for Crypto HTML animations
 DEFAULT_HTML_FOLDER = "1wcWaKj1Nl-SnHArkmhdD_8Ml_-SlV3Bb"
-DEFAULT_MUSIC_FOLDER = "19zTCpkmKpZwUm8j8gnvfHZqVJqfwEz9I"
 
 def get_drive_service():
     sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_KEY")
@@ -51,7 +49,7 @@ def download_folder_files(service, folder_id: str, target_dir: Path, valid_exts:
     target_dir.mkdir(parents=True, exist_ok=True)
     downloaded = []
     
-    print(f"\n📂 Syncing Folder (ID: {folder_id}) -> {target_dir.name}/")
+    print(f"\n📂 Syncing HTML Folder (ID: {folder_id}) -> {target_dir.name}/")
     query = f"'{folder_id}' in parents and trashed = false"
     
     page_token = None
@@ -78,7 +76,6 @@ def download_folder_files(service, folder_id: str, target_dir: Path, valid_exts:
             continue
             
         dest = target_dir / name
-        # Skip if already exists and size matches
         if dest.exists() and f.get('size') and dest.stat().st_size == int(f['size']):
             downloaded.append(name)
             continue
@@ -102,14 +99,9 @@ def sync_all():
         return
 
     html_folder = os.environ.get("GDRIVE_HTML_FOLDER_ID", DEFAULT_HTML_FOLDER)
-    music_folder = os.environ.get("GDRIVE_MUSIC_FOLDER_ID", DEFAULT_MUSIC_FOLDER)
-
     html_files = download_folder_files(service, html_folder, HTML_DIR, valid_exts=['.html', '.htm'])
-    music_files = download_folder_files(service, music_folder, MUSIC_DIR, valid_exts=['.mp3', '.wav', '.m4a'])
 
-    print("\n✅ Sync complete!")
-    print(f"  HTML files synced: {len(html_files)}")
-    print(f"  Music tracks synced: {len(music_files)}\n")
+    print(f"\n✅ Sync complete! HTML animation files synced: {len(html_files)}\n")
 
 if __name__ == "__main__":
     sync_all()

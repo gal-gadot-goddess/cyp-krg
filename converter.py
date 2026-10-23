@@ -2,7 +2,7 @@
 cyp-krg Video Converter: HTML Animation + Native Web Audio SFX -> 1080x1920 60FPS Video
 Engineered for 9:16 Vertical Video (Instagram Reels / Facebook Reels / YouTube Shorts)
 Branded for @cryptokregg (Crypto, DeFi, Web3, Blockchain Visuals)
-Captures in-browser real-time Web Audio API synthesized sound effects and merges via FFmpeg.
+Captures in-browser real-time Web Audio API synthesized sound effects ONLY. No background music.
 """
 
 import os
@@ -28,7 +28,6 @@ from playwright.sync_api import sync_playwright
 
 BASE_DIR = Path(__file__).resolve().parent
 HTML_DIR = BASE_DIR / "html_sources"
-MUSIC_DIR = BASE_DIR / "music"
 OUTPUT_DIR = BASE_DIR / "output"
 TEMP_DIR = OUTPUT_DIR / ".temp_recordings"
 
@@ -36,11 +35,9 @@ def detect_duration(file_content: str, default_duration: float = 16.5) -> float:
     """
     Detects animation timeline duration from code or defaults to 16.5s for crypto reels.
     """
-    # Look inside buildTimeline function first
     bt = re.search(r'function\s+buildTimeline\s*\(\s*\)\s*\{([\s\S]*?)\n\s*\}', file_content)
     search_target = bt.group(1) if bt else file_content
 
-    # Look for last 'at(XX.XX, ...)' or 'a(XX.XX, ...)'
     matches = re.findall(r'(?<![a-zA-Z0-9_])(?:at|a)\s*\(\s*([0-9.]+)\s*,', search_target)
     if matches:
         last_t = max(float(x) for x in matches)
@@ -48,7 +45,6 @@ def detect_duration(file_content: str, default_duration: float = 16.5) -> float:
         print(f"  [Duration] Detected from last timeline event ({last_t:.2f}s): {dur:.2f}s")
         return dur
 
-    # Look for DUR = XX
     dur_match = re.search(r'DUR\s*=\s*([0-9.]+)', file_content)
     if dur_match:
         val = float(dur_match.group(1))
@@ -61,7 +57,6 @@ def detect_duration(file_content: str, default_duration: float = 16.5) -> float:
 def convert_html_to_video(
     html_path: Path,
     output_mp4: Path = None,
-    audio_path: Path = None,
     duration: float = None,
     handle: str = "@cryptokregg",
     width: int = 1080,
@@ -93,7 +88,7 @@ def convert_html_to_video(
     print(f"🏷️ Branding Handle: {handle}")
     print(f"📐 Target: {width}x{height} @ {fps} FPS (9:16 Vertical)")
     print(f"⏱️ Duration: {duration:.2f}s | CRF: {crf}")
-    print(f"🔊 Capturing native Web Audio API sound effects")
+    print(f"🔊 Audio Mode: Native Web Audio API Sound Effects ONLY (NO background music)")
     print(f"{'=' * 65}")
 
     # 1. Launch Playwright with AudioContext hook
@@ -165,7 +160,7 @@ def convert_html_to_video(
 
         page.goto(file_uri, wait_until="load")
 
-        # Hide interactive replay/mute buttons and developer safe zone UI
+        # Hide interactive replay/mute buttons and UI controls
         page.add_style_tag(content="""
             #mute, #replayBtn, .ctl, .ui, #ui {
                 display: none !important;
@@ -203,7 +198,7 @@ def convert_html_to_video(
             }
         }""")
 
-        print(f"⏺️  Recording visual frames + Web Audio for {duration:.2f}s...")
+        print(f"⏺️  Recording visual frames + Web Audio SFX for {duration:.2f}s...")
         time.sleep(duration)
 
         # Retrieve captured sound effects audio stream
@@ -246,58 +241,14 @@ def convert_html_to_video(
 
     fade_start = max(0.0, duration - 0.5)
 
-    # 4. FFmpeg Muxing: Video + SFX + (Optional BGM bed)
+    # 4. FFmpeg Muxing: Video + Native SFX Only (Strictly NO BGM)
     print("⚡ Encoding high-quality MP4 with FFmpeg...")
 
-    if has_sfx and audio_path and Path(audio_path).exists():
-        # Mix SFX (loud) + BGM (subtle bed at 20%)
-        print(f"🎵 Mixing background track bed: {Path(audio_path).name} (ducked to 20%)")
+    if has_sfx:
         ffmpeg_cmd = [
             "ffmpeg", "-y",
             "-i", str(raw_video),
             "-i", str(sfx_audio_path),
-            "-stream_loop", "-1",
-            "-i", str(audio_path),
-            "-filter_complex",
-            f"[1:a]volume=1.0[sfx];[2:a]volume=0.20[bgm];[sfx][bgm]amix=inputs=2:duration=first,afade=t=out:st={fade_start:.2f}:d=0.5[aout]",
-            "-map", "0:v:0",
-            "-map", "[aout]",
-            "-c:v", "libx264",
-            "-preset", "fast",
-            "-crf", str(crf),
-            "-pix_fmt", "yuv420p",
-            "-r", str(fps),
-            "-c:a", "aac",
-            "-b:a", "192k",
-            "-t", str(duration),
-            str(output_mp4)
-        ]
-    elif has_sfx:
-        # Native SFX only
-        ffmpeg_cmd = [
-            "ffmpeg", "-y",
-            "-i", str(raw_video),
-            "-i", str(sfx_audio_path),
-            "-map", "0:v:0",
-            "-map", "1:a:0",
-            "-c:v", "libx264",
-            "-preset", "fast",
-            "-crf", str(crf),
-            "-pix_fmt", "yuv420p",
-            "-r", str(fps),
-            "-c:a", "aac",
-            "-b:a", "192k",
-            "-af", f"afade=t=out:st={fade_start:.2f}:d=0.5",
-            "-t", str(duration),
-            str(output_mp4)
-        ]
-    elif audio_path and Path(audio_path).exists():
-        # Fallback to looping music only
-        ffmpeg_cmd = [
-            "ffmpeg", "-y",
-            "-i", str(raw_video),
-            "-stream_loop", "-1",
-            "-i", str(audio_path),
             "-map", "0:v:0",
             "-map", "1:a:0",
             "-c:v", "libx264",
@@ -312,7 +263,7 @@ def convert_html_to_video(
             str(output_mp4)
         ]
     else:
-        # Video only
+        # Video only fallback if no audio context
         ffmpeg_cmd = [
             "ffmpeg", "-y",
             "-i", str(raw_video),
@@ -380,12 +331,11 @@ def convert_html_to_video(
     return output_mp4
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert cyp-krg HTML animations to 9:16 Video with Web Audio SFX")
+    parser = argparse.ArgumentParser(description="Convert cyp-krg HTML animations to 9:16 Video with native Web Audio SFX (No background music)")
     parser.add_argument("html_file", help="Path to HTML file to convert")
     parser.add_argument("-o", "--output", help="Output MP4 path")
     parser.add_argument("-d", "--duration", type=float, help="Explicit duration in seconds")
     parser.add_argument("--handle", default="@cryptokregg", help="Branding handle (default: @cryptokregg)")
-    parser.add_argument("--bgm", help="Optional background music file to mix with sound effects")
     args = parser.parse_args()
 
-    convert_html_to_video(args.html_file, output_mp4=args.output, duration=args.duration, handle=args.handle, audio_path=args.bgm)
+    convert_html_to_video(args.html_file, output_mp4=args.output, duration=args.duration, handle=args.handle)

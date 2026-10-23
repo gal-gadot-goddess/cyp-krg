@@ -1,6 +1,7 @@
 """
 Automated Pipeline Orchestrator for cyp-krg (Crypto / DeFi / Web3 Reels)
-Coordinates: Google Drive Sync -> Weighted LRU Selection -> Web Audio SFX Video Render -> AI Metadata -> Social Media Upload (@cryptokregg & CryptoKregg)
+Coordinates: Google Drive Sync -> Weighted LRU Selection -> Native Web Audio SFX Video Render -> AI Metadata -> Social Media Upload (@cryptokregg & CryptoKregg)
+Strictly uses native Web Audio API sound effects only (NO background music).
 Follows the canonical once-daily weighted-average/LRU publishing law.
 """
 
@@ -22,7 +23,6 @@ if sys.platform == "win32":
 
 BASE_DIR = Path(__file__).resolve().parent
 HTML_DIR = BASE_DIR / "html_sources"
-MUSIC_DIR = BASE_DIR / "music"
 OUTPUT_DIR = BASE_DIR / "output"
 HISTORY_FILE = BASE_DIR / "history.json"
 METADATA_FILE = BASE_DIR / "metadata.json"
@@ -86,34 +86,10 @@ def select_candidate_weighted_lru(candidates: list, history: list, allow_recircu
 
     return None
 
-def select_music_weighted_lru(music_files: list, history: list):
-    """
-    Selects background music track using Weighted LRU to ensure even rotation across all available tracks.
-    """
-    if not music_files:
-        return None
-
-    counts = {}
-    for entry in history:
-        track = entry.get("music", "")
-        if track:
-            counts[track.strip().lower()] = counts.get(track.strip().lower(), 0) + 1
-
-    unplayed = [f for f in music_files if f.name.strip().lower() not in counts]
-    if unplayed:
-        chosen = random.choice(unplayed)
-        print(f"🎵 [Music Selection] Selected unplayed track: '{chosen.name}'")
-        return chosen
-
-    weights = [max(1, 1000 // (3 ** min(counts.get(f.name.strip().lower(), 0), 6))) for f in music_files]
-    chosen = random.choices(music_files, weights=weights, k=1)[0]
-    used = counts.get(chosen.name.strip().lower(), 0)
-    print(f"🎵 [Music Selection] Recirculated track: '{chosen.name}' (used {used} times before).")
-    return chosen
-
-def run_pipeline(publish: bool = True, force: bool = False, use_bgm: bool = False, file_name: str = None):
+def run_pipeline(publish: bool = True, force: bool = False, file_name: str = None):
     print("\n" + "=" * 65)
     print("🎬 STARTING CYP-KRG AUTOMATION CYCLE (DAILY CRYPTO REEL)")
+    print("🔊 Audio: Native Web Audio API Sound Effects ONLY (NO BGM)")
     print("=" * 65)
 
     # 1. Sync from Google Drive if Service Account is configured
@@ -156,21 +132,15 @@ def run_pipeline(publish: bool = True, force: bool = False, use_bgm: bool = Fals
     topic_title = clean_filename_to_title(target_file.name)
     print(f"🎯 [Step 2] Active Topic: '{topic_title}' ({target_file.name})")
 
-    # Select background music track via Weighted LRU if BGM is enabled
-    chosen_music = None
-    music_files = sorted(list(MUSIC_DIR.glob("*.mp3")) + list(MUSIC_DIR.glob("*.wav")))
-    if use_bgm and music_files:
-        chosen_music = select_music_weighted_lru(music_files, history)
-
     # 3. Generate AI Metadata with Pollinations AI
     print("\n🧠 [Step 3] Generating AI metadata via Pollinations AI...")
     metadata = generate_ai_metadata(topic_title, html_file_path=target_file)
     METADATA_FILE.write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"✅ Metadata saved to metadata.json (Title: '{metadata.get('title')}')")
 
-    # 4. Render 1080p 60FPS Video with Native Web Audio SFX
+    # 4. Render 1080p 60FPS Video with Native Web Audio SFX Only
     print("\n📹 [Step 4] Rendering vertical video with native Web Audio SFX (1080x1920 @ 60FPS)...")
-    video_path = convert_html_to_video(target_file, audio_path=chosen_music, handle="@cryptokregg")
+    video_path = convert_html_to_video(target_file, handle="@cryptokregg")
     print(f"✅ Video render complete: {video_path.name}")
 
     # 5. Upload to Facebook and Instagram
@@ -187,7 +157,6 @@ def run_pipeline(publish: bool = True, force: bool = False, use_bgm: bool = Fals
         "file": target_file.name,
         "title": metadata.get("title"),
         "video": video_path.name,
-        "music": chosen_music.name if chosen_music else None,
         "timestamp": now_iso,
         "publish": publish_res
     })
@@ -201,8 +170,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Full Automation Pipeline Orchestrator for cyp-krg")
     parser.add_argument("--publish", action="store_true", help="Publish generated video to social media")
     parser.add_argument("--force", action="store_true", help="Force process even if already in history")
-    parser.add_argument("--bgm", action="store_true", help="Mix subtle background music bed under sound effects")
     parser.add_argument("--file", help="Specific HTML file to process")
     args = parser.parse_args()
 
-    run_pipeline(publish=args.publish, force=args.force, use_bgm=args.bgm, file_name=args.file)
+    run_pipeline(publish=args.publish, force=args.force, file_name=args.file)

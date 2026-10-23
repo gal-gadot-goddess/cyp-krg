@@ -37,7 +37,6 @@ jobs:
           POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
           GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
           GDRIVE_HTML_FOLDER_ID: ${{ secrets.GDRIVE_HTML_FOLDER_ID }}
-          GDRIVE_MUSIC_FOLDER_ID: ${{ secrets.GDRIVE_MUSIC_FOLDER_ID }}
           
           # Meta & Social Credentials for CryptoKregg / @cryptokregg
           META_LONG_LIVED_ACCESS_TOKEN: ${{ secrets.META_LONG_LIVED_ACCESS_TOKEN }}
