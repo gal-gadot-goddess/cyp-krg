@@ -22,5 +22,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ_18_Private_Key_to_Address.html",
+    "title": "🔐 Private Key → Address: One-Way Math Behind Your Wallet",
+    "video": "VIZ_18_Private_Key_to_Address.mp4",
+    "timestamp": "2026-10-23T21:41:41Z",
+    "publish": {
+      "instagram": {
+        "id": "17889147330479312",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "status": "failed",
+        "page": "CryptoKregg",
+        "error": "Confirm your identity before you can publish as this Page. Open the Facebook app on your phone and follow the instructions."
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
