@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>VIZ 13 · Merkle Tree</title>
+<style>
+:root{--bg:#04080c;--c:#29d9ff;--y:#ffd23f;--g:#39ff88;--r:#ff3b4e;--t:#e8eaf6;--d:#7b8a9a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:radial-gradient(110% 60% at 50% 30%,#06263a 0%,var(--bg) 65%);overflow:hidden;border-radius:14px}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 7}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.top{position:absolute;top:14px;left:16px;right:16px;z-index:5}
+.tag{font-size:11px;letter-spacing:.2em;color:var(--c)}
+.bars{display:flex;gap:4px;margin-top:8px}
+.bars i{flex:1;height:3px;background:#1d2a36;border-radius:2px;overflow:hidden;position:relative}
+.bars i b{position:absolute;inset:0;background:var(--c);transform:scaleX(0);transform-origin:left}
+.sc{position:absolute;inset:50px 0 0;opacity:0;pointer-events:none;transition:opacity .5s;padding:0 18px}
+.sc.on{opacity:1}
+h1{font-size:38px;line-height:1.02;margin:140px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;color:var(--c);text-shadow:0 0 24px var(--c)}
+.sub{color:var(--d);font-size:14px;line-height:1.5}
+h2{font-size:21px;margin:26px 0 4px;letter-spacing:-.02em}
+.cap{font-size:12px;color:var(--d);line-height:1.5}
+.node rect{fill:#08141e;stroke:#27445a;stroke-width:1.4;transition:all .35s}
+.node text{fill:#8fb4cc;font-size:9.5px;text-anchor:middle;transition:fill .35s}
+.node{opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.4);transition:opacity .4s,transform .4s}
+.node.show{opacity:1;transform:none}
+.node.dim{opacity:.18}
+.node.gold rect{stroke:var(--y);fill:#2a2208;filter:drop-shadow(0 0 7px var(--y))}.node.gold text{fill:var(--y)}
+.node.sib rect{stroke:var(--c);fill:#06303f;filter:drop-shadow(0 0 7px var(--c))}.node.sib text{fill:var(--c)}
+.node.ok rect{stroke:var(--g);fill:#07301a;filter:drop-shadow(0 0 7px var(--g))}.node.ok text{fill:var(--g)}
+.node.bad rect{stroke:var(--r);fill:#33080f;filter:drop-shadow(0 0 8px var(--r))}.node.bad text{fill:var(--r)}
+.ed{stroke:#27445a;stroke-width:1.6;fill:none;stroke-dasharray:200;stroke-dashoffset:200;transition:stroke-dashoffset .5s,stroke .3s,opacity .3s}
+.ed.show{stroke-dashoffset:0}
+.ed.sib{stroke:var(--c)}.ed.ok{stroke:var(--g)}.ed.bad{stroke:var(--r)}.ed.dim{opacity:.15}
+.tl{fill:#5f7a8e;font-size:9px;text-anchor:middle;opacity:0;transition:opacity .4s}
+.tl.show{opacity:1}.tl.bad{fill:var(--r)}
+#hdr{fill:#7b8a9a;font-size:9px;text-anchor:middle;opacity:0;transition:all .4s}
+#hdr.show{opacity:1}#hdr.ok{fill:var(--g)}#hdr.bad{fill:var(--r)}
+#note{min-height:50px;margin-top:4px;padding:11px 12px;border:1px solid #1d3a4e;border-radius:12px;font-size:12px;line-height:1.5;background:#071018;transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(255,59,78,.1);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(57,255,136,.08);color:var(--g)}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+.ln{padding:14px 12px;border-radius:12px;border:1px solid #1d3a4e;background:#07121b;font-size:13px;line-height:1.45;opacity:0;transform:translateY(24px);transition:all .6s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="top"><div class="tag">VIZ 13 · WEB3 / BLOCKCHAIN</div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+
+ <section class="sc" id="s0">
+  <h1>Verify 1 tx<br>out of thousands<br>with <em>3 hashes.</em></h1>
+  <div class="sub">The Merkle tree: how blocks fingerprint every transaction in a single root.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2 id="rt">Build</h2>
+  <div class="cap" id="rs"></div>
+  <svg viewBox="0 0 324 340" width="324" height="340" id="svg"></svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s3">
+  <h2>Why it matters</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🌳 <b>One root</b> fingerprints every transaction in the block.</div>
+   <div class="ln" id="l2">🪶 <b>Light clients</b> verify with log₂(n) hashes, not the whole block.</div>
+   <div class="ln" id="l3">🔍 <b>Tamper-evident.</b> Change one byte and the root changes.</div>
+  </div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+
+function h(s){let x=2166136261;for(const c of s){x^=c.charCodeAt(0);x=Math.imul(x,16777619)}x^=x>>>15;x=Math.imul(x,2246822507);x^=x>>>13;return(x>>>0).toString(16).padStart(8,'0').slice(0,4)}
+const lv=[8,4,2,1],Y=[290,216,142,68],NS='http://www.w3.org/2000/svg';
+const X=(l,i)=>l?(X(l-1,2*i)+X(l-1,2*i+1))/2:24+i*39.5;
+let txs,vals;
+function calc(){vals=[txs.map(t=>h('tx'+t))];for(let l=1;l<4;l++){vals[l]=[];for(let i=0;i<lv[l];i++)vals[l][i]=h(vals[l-1][2*i]+vals[l-1][2*i+1])}}
+const svg=$('#svg');
+const mk=(t,a,p=svg)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+const N={},E={},TL=[];
+for(let l=0;l<3;l++)for(let i=0;i<lv[l];i++){const x=X(l,i),px=X(l+1,i>>1);
+ E[l+'_'+i]=mk('path',{d:`M${x} ${Y[l]-11} C${x} ${Y[l]-40},${px} ${Y[l+1]+40},${px} ${Y[l+1]+11}`,class:'ed'})}
+for(let l=0;l<4;l++)for(let i=0;i<lv[l];i++){const g=mk('g',{class:'node'});
+ mk('rect',{x:X(l,i)-17,y:Y[l]-11,width:34,height:22,rx:6},g);
+ N[l+'_'+i]={g,t:mk('text',{x:X(l,i),y:Y[l]+3.5},g)}}
+for(let i=0;i<8;i++)TL.push(mk('text',{x:X(0,i),y:322,class:'tl'}));
+const hdr=mk('text',{x:162,y:30,id:'hdr'});
+const nd=(l,i)=>N[l+'_'+i].g;
+function put(l,i){N[l+'_'+i].t.textContent=vals[l][i]}
+function resetTree(){txs='ABCDEFGH'.split('');calc();
+ for(const k in N){const[l,i]=k.split('_');put(+l,+i);N[k].g.setAttribute('class','node')}
+ for(const k in E)E[k].setAttribute('class','ed');
+ TL.forEach((t,i)=>{t.textContent='TX '+txs[i];t.setAttribute('class','tl')});
+ hdr.setAttribute('class','');hdr.setAttribute('id','hdr');hdr.textContent='';note('…')}
+function cls(el,c){el.classList.add(c)}
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+
+const segs=$$('.bars b');
+function scene(n,ms,id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id));
+ segs.forEach((b,i)=>{b.style.transition='none';b.style.transform=i<n?'scaleX(1)':'scaleX(0)'});
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{segs[n].style.transition='transform '+ms+'ms linear';segs[n].style.transform='scaleX(1)'}))}
+
+const path=[[0,2],[1,1],[2,0],[3,0]],sibs=[[0,3],[1,0],[2,1]];
+async function build(){
+ for(let i=0;i<8;i++){cls(nd(0,i),'show');TL[i].classList.add('show');await sleep(140)}
+ note('Each transaction is hashed into a leaf.');await sleep(1000);
+ for(let l=1;l<4;l++){
+  for(let i=0;i<lv[l];i++){cls(E[(l-1)+'_'+(2*i)],'show');cls(E[(l-1)+'_'+(2*i+1)],'show')}
+  await sleep(500);
+  for(let i=0;i<lv[l];i++)cls(nd(l,i),'show');
+  note(l<3?'Hash each pair together, level by level.':'…until one hash remains: the Merkle root.');await sleep(1100)}
+ cls(nd(3,0),'gold');hdr.textContent='block header root: '+vals[3][0];hdr.setAttribute('class','show');
+ note('The root goes into the block header. It commits to all 8 transactions.','good');await sleep(1800);
+}
+async function proof(){
+ const keep=new Set([...path,...sibs].map(a=>a.join('_')));
+ for(const k in N)if(!keep.has(k))cls(N[k].g,'dim');
+ const pe=new Set(['0_2','1_1','2_0']),se=new Set(['0_3','1_0','2_1']);
+ for(const k in E)if(!pe.has(k)&&!se.has(k))cls(E[k],'dim');
+ cls(nd(0,2),'gold');note('Goal: prove TX C is in this block.');await sleep(1500);
+ for(const[l,i] of sibs){cls(nd(l,i),'sib');cls(E[l+'_'+i],'sib');await sleep(850)}
+ note('The prover sends only these 3 sibling hashes.');await sleep(1500);
+ for(let k=1;k<4;k++){const[l,i]=path[k];cls(E[(l-1)+'_'+path[k-1][1]],'ok');await sleep(300);
+  nd(l,i).classList.remove('gold');cls(nd(l,i),'ok');note('Recompute upward: hash(your hash + sibling).');await sleep(1000)}
+ hdr.classList.add('ok');hdr.textContent='✔ matches header root '+vals[3][0];
+ note('✔ Root matches. TX C is in the block: 3 hashes instead of 8 transactions.','good');await sleep(2500);
+}
+async function tamper(){
+ for(const k in N)N[k].g.classList.remove('dim');
+ for(const k in E)E[k].classList.remove('dim');
+ const orig=vals.map(a=>a.slice());
+ txs[2]='C′';TL[2].textContent='TX C′';TL[2].classList.add('bad');calc();
+ stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),900);
+ note('Someone edits TX C after the fact…','bad');
+ for(let k=0;k<4;k++){const[l,i]=path[k];nd(l,i).classList.remove('gold','ok','sib');put(l,i);cls(nd(l,i),'bad');
+  if(k)cls(E[(l-1)+'_'+path[k-1][1]],'bad');await sleep(900)}
+ note('One changed byte flips every hash up the path.','bad');await sleep(1100);
+ hdr.classList.remove('ok');hdr.classList.add('bad');hdr.textContent='✘ '+vals[3][0]+' ≠ header '+orig[3][0];
+ note('✘ Root mismatch. The block is rejected.','bad');await sleep(2800);
+}
+async function loop(){
+ while(true){
+  [1,2,3].forEach(i=>$('#l'+i).classList.remove('on'));
+  scene(0,3200,'s0');await sleep(3200);
+  resetTree();$('#rt').textContent='1 · Build the tree';$('#rs').textContent='8 transactions → 1 root.';
+  scene(1,12500,'s1');await sleep(500);await build();
+  $('#rt').textContent='2 · Prove one tx';$('#rs').textContent='Only the sibling hashes along the path are needed.';
+  scene(2,11500,'s1');await proof();
+  $('#rt').textContent='3 · Tamper';$('#rs').textContent='What if a past transaction is altered?';
+  scene(3,8500,'s1');await tamper();
+  scene(4,5500,'s3');await sleep(500);
+  for(const i of [1,2,3]){$('#l'+i).classList.add('on');await sleep(1300)}
+  await sleep(900);
+ }
+}
+resetTree();loop();
+</script>
+</body>
+</html>

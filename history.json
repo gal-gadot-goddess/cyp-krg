@@ -45,5 +45,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 12 · Flash Loan.html",
+    "title": "⚡ Flash Loans: Borrow $1M for $0—How?",
+    "video": "VIZ 12 · Flash Loan.mp4",
+    "timestamp": "2026-10-24T13:01:50Z",
+    "publish": {
+      "instagram": {
+        "id": "18128289934637776",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "status": "failed",
+        "page": "CryptoKregg",
+        "error": "Confirm your identity before you can publish as this Page. Open the Facebook app on your phone and follow the instructions."
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]

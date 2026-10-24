@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>VIZ 12 · Flash Loan</title>
+<style>
+:root{--bg:#05060d;--v:#9b6bff;--y:#ffd23f;--g:#39ff88;--r:#ff3b4e;--c:#29d9ff;--t:#e8eaf6;--d:#7b7f9a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:radial-gradient(110% 60% at 50% 35%,#1a1040 0%,var(--bg) 65%);overflow:hidden;border-radius:14px}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.55}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.top{position:absolute;top:14px;left:16px;right:16px;z-index:5}
+.tag{font-size:11px;letter-spacing:.2em;color:var(--y)}
+.bars{display:flex;gap:4px;margin-top:8px}
+.bars i{flex:1;height:3px;background:#23233a;border-radius:2px;overflow:hidden;position:relative}
+.bars i b{position:absolute;inset:0;background:var(--v);transform:scaleX(0);transform-origin:left}
+.sc{position:absolute;inset:50px 0 0;opacity:0;pointer-events:none;transition:opacity .5s;padding:0 18px}
+.sc.on{opacity:1}
+h1{font-size:40px;line-height:1;margin:150px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;color:var(--y);text-shadow:0 0 24px var(--y)}
+.sub{color:var(--d);font-size:14px;line-height:1.5}
+h2{font-size:21px;margin:26px 0 4px;letter-spacing:-.02em}
+.cap{font-size:12px;color:var(--d);line-height:1.5}
+#ringbox{position:relative;margin-top:2px}
+.nd rect{fill:#0d0d22;stroke:#34345a;stroke-width:1.5;transition:all .3s}
+.nd text{fill:#7b7f9a;font-size:10px;text-anchor:middle;transition:fill .3s}
+.nd.on rect{stroke:var(--y);fill:#1d1838;filter:drop-shadow(0 0 8px var(--y))}
+.nd.on text{fill:var(--y)}
+.nd.bad rect{stroke:var(--r);fill:#2a0d16;filter:drop-shadow(0 0 10px var(--r))}
+.nd.bad text{fill:var(--r)}
+#ctr{position:absolute;left:0;right:0;top:128px;text-align:center;pointer-events:none}
+#cv{font-size:25px;font-weight:700;letter-spacing:-.02em;transition:color .3s}
+#cl{font-size:10px;color:var(--d);margin-top:2px}
+#note{min-height:52px;margin-top:6px;padding:11px 12px;border:1px solid #2a2a4c;border-radius:12px;font-size:12px;line-height:1.5;background:#0a0a18;transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(255,59,78,.1);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(57,255,136,.08);color:var(--g)}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+.ln{padding:14px 12px;border-radius:12px;border:1px solid #34345a;background:#0b0b1c;font-size:13px;line-height:1.45;opacity:0;transform:translateY(24px);transition:all .6s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--y)}
+.ln.w{border-color:var(--r)}.ln.w b{color:var(--r)}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="top"><div class="tag">VIZ 12 · WEB3 / DEFI</div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+
+ <section class="sc" id="s0">
+  <h1>Borrow<br>$1,000,000<br>with <em>$0.</em></h1>
+  <div class="sub">Flash loans: uncollateralized, atomic, and gone before the block ends.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2 id="rt">Run A</h2>
+  <div class="cap" id="rs">Everything happens inside one transaction.</div>
+  <div id="ringbox">
+   <svg viewBox="0 0 324 372" width="324" height="372">
+    <defs><filter id="gw"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <path id="ring" fill="none" stroke="#2a2a4c" stroke-width="2" stroke-dasharray="3 6"/>
+    <circle id="prog" cx="162" cy="185" r="76" fill="none" stroke="#9b6bff" stroke-width="5" stroke-linecap="round" transform="rotate(-90 162 185)" stroke-dasharray="477.5" stroke-dashoffset="477.5" opacity=".9"/>
+    <circle cx="162" cy="185" r="76" fill="none" stroke="#1b1b36" stroke-width="5" opacity=".6" style="mix-blend-mode:normal"/>
+    <g id="coins" filter="url(#gw)"></g>
+    <g class="nd" id="n0"><rect x="112" y="48" width="100" height="34" rx="9"/><text x="162" y="62">① BORROW</text><text x="162" y="75" style="font-size:9px">lending pool</text></g>
+    <g class="nd" id="n1"><rect x="222" y="168" width="96" height="34" rx="9"/><text x="270" y="182">② BUY ETH</text><text x="270" y="195" style="font-size:9px">DEX A @ $1,000</text></g>
+    <g class="nd" id="n2"><rect x="112" y="288" width="100" height="34" rx="9"/><text x="162" y="302">③ SELL ETH</text><text x="162" y="315" id="pb" style="font-size:9px">DEX B @ $1,013</text></g>
+    <g class="nd" id="n3"><rect x="6" y="168" width="96" height="34" rx="9"/><text x="54" y="182">④ REPAY</text><text x="54" y="195" style="font-size:9px">principal + fee</text></g>
+   </svg>
+   <div id="ctr"><div id="cv">$0</div><div id="cl">your wallet</div></div>
+  </div>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s3">
+  <h2>Why it works</h2>
+  <div class="lines">
+   <div class="ln" id="l1">⚡ <b>Zero collateral.</b> You can borrow millions for a few seconds.</div>
+   <div class="ln" id="l2">🔒 <b>Atomic.</b> Repay in the same transaction or the whole thing reverts. Lender risk: none.</div>
+   <div class="ln w" id="l3">⚠ <b>Double-edged.</b> The same trick powers price-oracle manipulation exploits.</div>
+  </div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+
+const R=110,CX=162,CY=185,ring=$('#ring');
+ring.setAttribute('d',`M${CX} ${CY-R} A${R} ${R} 0 1 1 ${CX} ${CY+R} A${R} ${R} 0 1 1 ${CX} ${CY-R}`);
+const L=ring.getTotalLength(),NS='http://www.w3.org/2000/svg',coins=[];
+for(let i=0;i<18;i++){const c=document.createElementNS(NS,'circle');c.setAttribute('r',6-i*.22);$('#coins').appendChild(c);coins.push(c)}
+let head=0;
+function setHead(h,col){head=h;coins.forEach((c,i)=>{const f=h-i*.013;
+ if(f<0||f>1){c.setAttribute('opacity',0);return}
+ const p=ring.getPointAtLength(f*L);c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('fill',col);c.setAttribute('opacity',1-i*.05)});
+ const pr=$('#prog');pr.setAttribute('stroke-dashoffset',477.5*(1-Math.min(h,1)));pr.setAttribute('stroke',col)}
+function tween(a,b,ms,fn){return new Promise(res=>{const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/ms),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(t0)})}
+const GOLD='#ffd23f',RED='#ff3b4e';
+const mv=(to,ms,col=GOLD)=>tween(head,to,ms,h=>setHead(h,col));
+
+const segs=$$('.bars b');
+function scene(n,ms,id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id));
+ segs.forEach((b,i)=>{b.style.transition='none';b.style.transform=i<n?'scaleX(1)':'scaleX(0)'});
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{segs[n].style.transition='transform '+ms+'ms linear';segs[n].style.transform='scaleX(1)'}))}
+const node=(i,cls)=>{$('#n'+i).classList.remove('on','bad');if(cls)$('#n'+i).classList.add(cls)};
+function ctr(v,l,col){$('#cv').textContent=v;$('#cl').textContent=l;$('#cv').style.color=col||'var(--t)'}
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function resetRun(title,sub,price){$('#rt').textContent=title;$('#rs').textContent=sub;$('#pb').textContent=price;
+ [0,1,2,3].forEach(i=>node(i));setHead(0,GOLD);coins.forEach(c=>c.setAttribute('opacity',0));$('#prog').setAttribute('stroke-dashoffset',477.5);ctr('$0','your wallet');note('…')}
+
+async function run(ok){
+ node(0,'on');ctr('$1,000,000','borrowed, no collateral',GOLD);note('① Pool sends $1,000,000. The contract must repay before the tx ends.');setHead(.001,GOLD);await sleep(1800);
+ await mv(.25,1500);node(1,'on');ctr('1,000 ETH','bought @ $1,000',GOLD);note('② Spend the loan on DEX A. ETH is cheap here.');await sleep(1500);
+ await mv(.5,1500);node(2,'on');
+ if(ok){ctr('$1,013,000','sold @ $1,013',GOLD);note('③ Sell on DEX B where ETH costs more. Price gap = profit.')}
+ else{ctr('$998,000','sold @ $998',RED);note('③ Gap is gone. DEX B pays less than you spent.','bad')}
+ await sleep(1700);
+ await mv(.75,1500,ok?GOLD:RED);
+ if(ok){node(3,'on');ctr('−$1,000,900','repay + 0.09% fee',GOLD);note('④ Repay $1,000,900 to the pool, still inside the same transaction.');await sleep(1600);
+  await mv(1,1500);ctr('+$12,100','profit (before gas)','var(--g)');note('✔ Loan repaid. You keep the difference. Zero capital at risk.','good');await sleep(2400)}
+ else{node(3,'bad');ctr('SHORT $2,900','needs $1,000,900',RED);note('④ Can’t repay $1,000,900 with $998,000. The repay check fails.','bad');await sleep(1500);
+  stage.classList.add('gl');await sleep(1000);stage.classList.remove('gl');
+  note('↩ REVERT: the whole transaction rewinds, as if it never ran.','bad');
+  [1,2,3].forEach(i=>node(i));await tween(head,0,1700,h=>{setHead(h,RED);});
+  node(0);ctr('$0','nothing happened',RED);note('Lender lost nothing. You only pay the gas for the failed tx.','bad');await sleep(2800)}
+}
+async function loop(){
+ while(true){
+  [1,2,3].forEach(i=>$('#l'+i).classList.remove('on'));
+  scene(0,3200,'s0');await sleep(3200);
+  resetRun('Run A · price gap exists','Everything below happens inside one transaction.','DEX B @ $1,013');
+  scene(1,15500,'s1');await sleep(600);await run(true);
+  resetRun('Run B · gap closed','Same loan, but the arbitrage vanished.','DEX B @ $998');
+  scene(2,15500,'s1');await sleep(600);await run(false);
+  scene(3,5500,'s3');await sleep(500);
+  for(const i of [1,2,3]){$('#l'+i).classList.add('on');await sleep(1300)}
+  await sleep(900);
+ }
+}
+resetRun('Run A','','DEX B @ $1,013');loop();
+</script>
+</body>
+</html>
