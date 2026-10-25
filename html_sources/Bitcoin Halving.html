@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Bitcoin Halving</title>
+<style>
+:root{--bg:#070405;--y:#ffd23f;--o:#ff8a3d;--c:#29d9ff;--g:#39ff88;--r:#ff3b4e;--t:#f3ece4;--d:#a8927c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:300px;height:300px;left:-80px;top:20px;background:#8a4a00}
+.b2{width:240px;height:240px;right:-100px;top:340px;background:#3a1a8a;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-70px;background:#7a2a00;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:33px;line-height:1.05;margin:150px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--y),var(--o));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(255,170,40,.8))}
+.sub{color:#cdb79c;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #4a3418;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(20,12,6,.82);backdrop-filter:blur(4px);transition:all .3s}
+#note.hot{border-color:var(--y);background:rgba(60,40,6,.85);color:var(--y)}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.85);color:var(--g)}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #4a3418;background:rgba(20,12,6,.85);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--y)}
+.big{margin-top:20px;font-size:24px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--y),var(--o));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+#pop{opacity:0;transition:opacity .3s}#pop.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>Only <em>21 million</em><br>will ever exist.</h1>
+  <div class="sub">Bitcoin’s halving: how scarcity is written into the code.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>The halving clock</h2>
+  <svg viewBox="0 0 324 462" width="324" height="462">
+   <defs>
+    <filter id="gw" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="af" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd23f" stop-opacity=".35"/><stop offset="1" stop-color="#ffd23f" stop-opacity="0"/></linearGradient>
+   </defs>
+   <circle id="aura" cx="162" cy="160" r="150" fill="none" stroke="#ffd23f" stroke-width="2" opacity="0" filter="url(#gw)"/>
+   <g id="rings"></g>
+   <g id="parts"></g>
+   <circle id="tip" cx="162" cy="18" r="5" fill="#fff" filter="url(#gw)" opacity="0"/>
+   <text id="sup" x="162" y="162" fill="#ffd23f" font-size="17" font-weight="700" text-anchor="middle" style="filter:drop-shadow(0 0 8px rgba(255,210,63,.7))">0.00M</text>
+   <text id="sl" x="162" y="176" fill="#a8927c" font-size="7" text-anchor="middle" letter-spacing="1.2">BTC MINED</text>
+   <text id="pop" x="162" y="326" fill="#ffd23f" font-size="11" font-weight="700" text-anchor="middle" style="filter:drop-shadow(0 0 8px rgba(255,210,63,.8))">HALVING</text>
+   <path d="M14 440H310" stroke="#3a2a18"/>
+   <path id="car" fill="url(#af)"/>
+   <path id="chl" fill="none" stroke="#ffd23f" stroke-width="2.5" stroke-linejoin="round" filter="url(#gw)"/>
+   <g id="cl"></g>
+   <g id="yl"></g>
+   <text x="10" y="352" fill="#a8927c" font-size="8" letter-spacing="1">BLOCK REWARD</text>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">Scarcity by design</h2>
+  <div class="lines">
+   <div class="ln" id="l1">⛏ <b>Every 210,000 blocks</b> (about 4 years) the miner reward is cut in half.</div>
+   <div class="ln" id="l2">📉 <b>New supply shrinks.</b> Each halving slows how fast coins are created.</div>
+   <div class="ln" id="l3">🔒 <b>Hard cap: 21,000,000.</b> Every node enforces it.</div>
+   <div class="ln" id="l4">🕰 <b>The last coin</b> is expected to be mined around the year 2140.</div>
+  </div>
+  <div class="big" id="bg">Scarcity by code.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.4?'#ffd9a0':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+const CX=162,CY=160,R=[142,122,102,82,62,42],COL=['#ffd23f','#ffb020','#ff9a2a','#ff7a30','#ff5a46','#ff3b78'],
+ REW=[50,25,12.5,6.25,3.125,1.5625],YR=['2009','2012','2016','2020','2024','2028'],TOT=REW.map(r=>r*210000),
+ DUR=[3000,2600,2300,2100,2000,1900],CUM=[];TOT.reduce((a,t,i)=>CUM[i]=a+t,0);
+const rg=$('#rings'),ARC=[],LAB=[];
+R.forEach((r,i)=>{const C=2*Math.PI*r;
+ mk('circle',{cx:CX,cy:CY,r,fill:'none',stroke:'#2a1d10','stroke-width':11},rg);
+ ARC.push(mk('circle',{cx:CX,cy:CY,r,fill:'none',stroke:COL[i],'stroke-width':11,'stroke-linecap':'butt',transform:`rotate(-90 ${CX} ${CY})`,'stroke-dasharray':'0 '+C,filter:'url(#gw)'},rg));
+ const t=mk('text',{x:CX,y:CY-r-7.5,fill:COL[i],'font-size':7,'text-anchor':'middle',opacity:0,'letter-spacing':.8},rg);t.textContent=REW[i]+' BTC';LAB.push(t)});
+/* chart */
+const X0=14,W=49,Y0=440,yy=rw=>Y0-rw/50*76;
+const cl=$('#cl'),yl=$('#yl');
+YR.forEach((y,i)=>{const t=mk('text',{x:X0+i*W+W/2,y:454,fill:'#a8927c','font-size':8,'text-anchor':'middle'},yl);t.textContent=y});
+const CL=[];REW.forEach((r,i)=>{const t=mk('text',{x:X0+i*W+W/2,y:yy(r)-6,fill:COL[i],'font-size':8,'text-anchor':'middle',opacity:0},cl);t.textContent=r;CL.push(t)});
+let done='M'+X0+' '+yy(50);
+function chart(i,p,drop){const x=X0+i*W+W*p,y=yy(REW[i]);let d=done+'L'+x.toFixed(1)+' '+y.toFixed(1);
+ if(drop>0){const y2=yy(REW[i+1]);d+='L'+x.toFixed(1)+' '+(y+(y2-y)*drop).toFixed(1)}
+ $('#chl').setAttribute('d',d);$('#car').setAttribute('d',d+'L'+(drop>0?x:x).toFixed(1)+' '+Y0+'L'+X0+' '+Y0+'Z')}
+/* particles */
+let parts=[],emit=0,tx=CX,ty=CY-142,ang=0,pc='#ffd23f';
+function frame(){
+ if(emit>0&&parts.length<130){let n=emit>=1?Math.floor(emit)+(Math.random()<emit%1?1:0):(Math.random()<emit?1:0);
+  for(let k=0;k<n;k++){const v=.8+Math.random()*1.6,a=ang+(Math.random()-.5)*1.3;parts.push({x:tx,y:ty,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1,e:mk('circle',{r:1+Math.random()*2,fill:pc,filter:'url(#gw)'},$('#parts'))})}}
+ parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.l-=.022;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(t0)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+const fm=v=>(v/1e6).toFixed(2)+'M';
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+function pulse(r,c){const e=mk('circle',{cx:CX,cy:CY,r,fill:'none',stroke:c,'stroke-width':3,filter:'url(#gw)'},$('#parts'));
+ return tween(0,1,900,p=>{e.setAttribute('r',r+70*p);e.setAttribute('opacity',1-p)},eio).then(()=>e.remove())}
+function reset(){ARC.forEach((a,i)=>a.setAttribute('stroke-dasharray','0 '+2*Math.PI*R[i]));LAB.forEach(l=>l.setAttribute('opacity',0));CL.forEach(l=>l.setAttribute('opacity',0));
+ done='M'+X0+' '+yy(50);$('#chl').setAttribute('d','');$('#car').setAttribute('d','');$('#sup').textContent='0.00M';$('#sl').textContent='BTC MINED';
+ $('#aura').setAttribute('opacity',0);$('#tip').setAttribute('opacity',0);$('#pop').classList.remove('on');emit=0;$('#bg').classList.remove('on');$('#sup').setAttribute('fill','#ffd23f')}
+const MSG=['2009 · Bitcoin launches. Miners earn 50 BTC per block, minting 10.5M coins in the first four years.',
+ '2012 · The reward is cut to 25 BTC. Fewer new coins every day.',
+ '2016 · Down to 12.5 BTC per block.',
+ '2020 · Down to 6.25 BTC per block.',
+ '2024 · Down to 3.125 BTC per block.',
+ 'Next halving (~2028): 1.5625 BTC per block.'];
+async function main(){
+ reset();scene('s1');note('Time flows clockwise. Every ring is one 210,000-block epoch, about four years.');await sleep(2800);
+ for(let i=0;i<6;i++){
+  const r=R[i],C=2*Math.PI*r;pc=COL[i];LAB[i].setAttribute('opacity',1);CL[i].setAttribute('opacity',1);$('#tip').setAttribute('opacity',1);
+  note(MSG[i],i?'hot':'');
+  const prev=i?CUM[i-1]:0;
+  await tween(0,1,DUR[i],p=>{const a=-Math.PI/2+p*2*Math.PI;tx=CX+r*Math.cos(a);ty=CY+r*Math.sin(a);ang=a;
+   $('#tip').setAttribute('cx',tx);$('#tip').setAttribute('cy',ty);ARC[i].setAttribute('stroke-dasharray',(C*p).toFixed(1)+' '+C);
+   $('#sup').textContent=fm(prev+TOT[i]*p);emit=REW[i]/50*3.2;chart(i,p,0)});
+  emit=0;
+  if(i<5){
+   done+='L'+(X0+(i+1)*W)+' '+yy(REW[i]);
+   $('#pop').textContent='HALVING #'+(i+1)+' · '+REW[i]+' → '+REW[i+1]+' BTC';$('#pop').classList.add('on');
+   pulse(r+6,COL[i]);$('#tip').setAttribute('opacity',0);
+   await tween(0,1,500,d=>chart(i,1,d),eio);
+   done+='L'+(X0+(i+1)*W)+' '+yy(REW[i+1]);
+   await sleep(900);$('#pop').classList.remove('on')}
+ }
+ $('#tip').setAttribute('opacity',0);
+ note('The pattern repeats: every ~4 years the reward halves, and the total creeps toward one number…','hot');
+ $('#sl').textContent='BTC MINED';await sleep(1200);
+ const a0=CUM[5];pc='#ffd23f';
+ await tween(a0,21e6,3800,v=>{$('#sup').textContent=fm(v);const q=(v-a0)/(21e6-a0);$('#aura').setAttribute('opacity',(q*.9).toFixed(2));$('#aura').setAttribute('stroke-width',1+q*3)},p=>1-Math.pow(1-p,3));
+ $('#sup').textContent='21.00M';$('#sl').textContent='HARD CAP';$('#sup').setAttribute('fill','#fff');
+ for(let k=0;k<3;k++){pulse(40,'#ffd23f');await sleep(300)}
+ note('Hard cap: 21,000,000 BTC. The last coin is expected around the year 2140.','good');await sleep(4200);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of [1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>

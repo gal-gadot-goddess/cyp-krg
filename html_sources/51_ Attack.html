@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>51% Attack</title>
+<style>
+:root{--bg:#050a0a;--c:#29d9ff;--g:#39ff88;--r:#ff3b4e;--y:#ffd23f;--t:#e8eaf6;--d:#7f9a96;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:radial-gradient(110% 60% at 50% 45%,#0c2a2a 0%,var(--bg) 65%);overflow:hidden;border-radius:14px}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .5s;padding:26px 18px 0}
+.sc.on{opacity:1}
+h1{font-size:38px;line-height:1.02;margin:160px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;color:var(--r);text-shadow:0 0 24px var(--r)}
+.sub{color:var(--d);font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:4px;padding:11px 12px;border:1px solid #1d3a3a;border-radius:12px;font-size:12px;line-height:1.5;background:#08100f;transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(255,59,78,.1);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(57,255,136,.08);color:var(--g)}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+.ln{padding:14px 12px;border-radius:12px;border:1px solid #1d3a3a;background:#09130f;font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+svg text{font-family:inherit}
+.blk{opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.4);transition:opacity .45s,transform .45s}
+.blk.show{opacity:1;transform:none}
+.blk rect{fill:#08181c;stroke:#29d9ff;stroke-width:1.6;transition:all .4s}
+.blk text{fill:#9fe6f7;font-size:8px;text-anchor:middle}
+.blk.base rect{stroke:#4a6a6a}.blk.base text{fill:#8aa}
+.blk.tx rect{stroke:#ffd23f;fill:#2a2208;filter:drop-shadow(0 0 6px #ffd23f)}
+.blk.atk rect{stroke:#ff3b4e;fill:#240a10;stroke-dasharray:3 2}
+.blk.atk text{fill:#ff8a97}
+.blk.atk.show{opacity:.55}
+.blk.atk.rev{opacity:1}.blk.atk.rev rect{stroke-dasharray:none;filter:drop-shadow(0 0 7px #ff3b4e)}
+.blk.orph{opacity:.35!important}.blk.orph rect{stroke:#667;fill:#111;filter:none}.blk.orph text{fill:#778}
+.ed{fill:none;stroke:#29d9ff;stroke-width:1.6;stroke-dasharray:60;stroke-dashoffset:60;transition:stroke-dashoffset .4s,opacity .4s,stroke .4s}
+.ed.show{stroke-dashoffset:0}
+.ed.base{stroke:#4a6a6a}
+.ed.atk{stroke:#ff3b4e;stroke-dasharray:4 3;opacity:0}.ed.atk.show{stroke-dashoffset:0;opacity:.55}
+.ed.atk.rev{opacity:1;stroke-dasharray:60}
+.ed.orph{opacity:.25;stroke:#667}
+.lbl{font-size:8px;opacity:0;transition:opacity .4s}
+.lbl.show{opacity:1}
+#stamp{opacity:0;transition:opacity .4s}
+#stamp.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+ <section class="sc" id="s0">
+  <h1>51% of the<br>hash power<br>can rewrite <em>history.</em></h1>
+  <div class="sub">The 51% attack: how a longer secret chain erases a payment you already saw confirmed.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>The 51% attack</h2>
+  <svg viewBox="0 0 324 470" width="324" height="470" id="svg">
+   <circle cx="48" cy="56" r="30" fill="none" stroke="#29d9ff" stroke-width="9" opacity=".7"/>
+   <circle id="dn" cx="48" cy="56" r="30" fill="none" stroke="#ff3b4e" stroke-width="9" transform="rotate(-90 48 56)" stroke-dasharray="0 188.5" style="filter:drop-shadow(0 0 5px #ff3b4e)"/>
+   <path d="M48 82V92" stroke="#ffd23f" stroke-width="2"/>
+   <text x="48" y="104" fill="#ffd23f" font-size="8" text-anchor="middle">50%</text>
+   <text x="96" y="30" fill="#7f9a96" font-size="9">ATTACKER HASH POWER</text>
+   <text id="pc" x="96" y="62" fill="#ff3b4e" font-size="28" font-weight="700">30%</text>
+   <text id="hp" x="96" y="82" fill="#29d9ff" font-size="10">honest miners: 70%</text>
+   <g id="chain"></g>
+   <text class="lbl" id="lt1" x="82" y="352" fill="#ffd23f" text-anchor="end">100 BTC →</text>
+   <text class="lbl" id="lt2" x="82" y="362" fill="#ffd23f" text-anchor="end">exchange</text>
+   <text class="lbl" id="la1" x="242" y="352" fill="#ff8a97">100 BTC →</text>
+   <text class="lbl" id="la2" x="242" y="362" fill="#ff8a97">self (secret)</text>
+   <text class="lbl" id="lh" x="100" y="150" fill="#29d9ff" text-anchor="middle" style="font-size:9px">public chain</text>
+   <text class="lbl" id="lk" x="224" y="150" fill="#ff3b4e" text-anchor="middle" style="font-size:9px">secret chain</text>
+   <g id="stamp"><text x="100" y="270" fill="#ff3b4e" font-size="17" font-weight="900" text-anchor="middle" transform="rotate(-18 100 262)" style="paint-order:stroke;stroke:#050a0a;stroke-width:4px">ORPHANED</text></g>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:34px;font-size:24px">Why it’s hard</h2>
+  <div class="lines">
+   <div class="ln" id="l1">💸 <b>Costly.</b> You need more than half of the whole network’s hash power.</div>
+   <div class="ln" id="l2">⏳ <b>Confirmations help.</b> The deeper a block, the harder it is to out-race.</div>
+   <div class="ln" id="l3">🌱 <b>Small chains are exposed.</b> Less hash power means cheaper to rent.</div>
+  </div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg',G=$('#chain');
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+const D={}; // id -> {x,y,par,g,ed}
+function blk(id,x,y,label,cls,par){const g=mk('g',{class:'blk '+cls},G);mk('rect',{x:x-15,y:y-11,width:30,height:22,rx:5},g);mk('text',{x,y:y+3},g).textContent=label;
+ let ed=null;if(par){const p=D[par];ed=mk('path',{d:`M${x} ${y+11}L${p.x} ${p.y-11}`,class:'ed '+(cls.includes('atk')?'atk':cls.includes('base')?'base':'')},G)}
+ D[id]={x,y,par,g,ed}}
+blk('b0',162,440,'100','base',null);blk('b1',162,402,'101','base','b1x'.slice(0,0)||'b0');
+for(let k=1;k<=5;k++)blk('h'+k,100,402-k*40,String(101+k),'hon'+(k==1?' tx':''),k==1?'b1':'h'+(k-1));
+for(let k=1;k<=6;k++)blk('a'+k,224,402-k*40,String(101+k),'atk',k==1?'b1':'a'+(k-1));
+// ensure edges are drawn under blocks
+$$('#chain .ed').forEach(e=>G.insertBefore(e,G.firstChild));
+const show=id=>{D[id].g.classList.add('show');D[id].ed&&D[id].ed.classList.add('show')};
+function tween(a,b,ms,fn){return new Promise(res=>{const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/ms),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(t0)})}
+const C=188.5;
+function setPct(v){$('#dn').setAttribute('stroke-dasharray',(C*v/100).toFixed(1)+' '+C);$('#pc').textContent=Math.round(v)+'%';$('#hp').textContent='honest miners: '+Math.round(100-v)+'%';
+ $('#pc').setAttribute('fill',v>50?'#ff3b4e':'#ffb0b8')}
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+function reset(){for(const k in D){D[k].g.setAttribute('class','blk '+(k[0]=='b'?'base':k[0]=='a'?'atk':'hon'+(k=='h1'?' tx':'')));if(D[k].ed)D[k].ed.setAttribute('class','ed '+(k[0]=='a'?'atk':k[0]=='b'?'base':''))}
+ $$('.lbl').forEach(e=>e.classList.remove('show'));$('#stamp').classList.remove('on');setPct(30);note('Miners compete to extend the chain. Longest valid chain wins.')}
+async function main(){
+ reset();scene('s1');await sleep(1500);
+ show('b0');await sleep(450);show('b1');await sleep(450);$('#lh').classList.add('show');
+ show('h1');$('#lt1').classList.add('show');$('#lt2').classList.add('show');note('Alice pays an exchange 100 BTC. The payment lands in block 102.');await sleep(1700);
+ show('h2');await sleep(800);show('h3');note('✔ 3 confirmations. The exchange credits Alice, who withdraws the coins.','good');await sleep(2000);
+ note('But the attacker secretly mines a private fork from block 101, with a payment to himself.','bad');
+ $('#lk').classList.add('show');show('a1');$('#la1').classList.add('show');$('#la2').classList.add('show');await sleep(1500);
+ show('h4');await sleep(700);show('a2');await sleep(700);show('h5');await sleep(900);
+ note('With 30% hash power he falls behind: 2 secret blocks vs 5 public ones.','bad');await sleep(2000);
+ note('Now he gets over 50% of the hash power (rented or bought).','bad');
+ await tween(30,52,2000,setPct);await sleep(500);
+ note('His secret chain now grows faster than the honest one.','bad');
+ for(const k of [3,4,5,6]){show('a'+k);await sleep(650)}
+ await sleep(900);
+ stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),950);
+ for(let k=1;k<=6;k++){D['a'+k].g.classList.add('rev');D['a'+k].ed&&D['a'+k].ed.classList.add('rev')}
+ for(let k=1;k<=5;k++){D['h'+k].g.classList.add('orph');D['h'+k].ed.classList.add('orph')}
+ $('#lt1').classList.remove('show');$('#lt2').classList.remove('show');$('#stamp').classList.add('on');
+ note('He publishes the longer chain. Nodes switch to it, Alice’s payment disappears, and the coins are spent twice.','bad');
+ await sleep(4200);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of [1,2,3]){$('#l'+i).classList.add('on');await sleep(1300)}
+ await sleep(1500);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3200);await main()}})();
+</script>
+</body>
+</html>

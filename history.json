@@ -68,5 +68,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ_10_Ethereum_L1_vs_Rollup_L2.html",
+    "title": "Ethereum L1 vs L2 Rollups: Fees in Real Time ⚡",
+    "video": "VIZ_10_Ethereum_L1_vs_Rollup_L2.mp4",
+    "timestamp": "2026-10-25T13:28:38Z",
+    "publish": {
+      "instagram": {
+        "id": "18152497624551543",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "status": "failed",
+        "page": "CryptoKregg",
+        "error": "Confirm your identity before you can publish as this Page. Open the Facebook app on your phone and follow the instructions."
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]

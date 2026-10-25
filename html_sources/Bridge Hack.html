@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Bridge Hack</title>
+<style>
+:root{--bg:#030a14;--c:#29d9ff;--v:#b46bff;--g:#39ff88;--r:#ff3b4e;--y:#ffd23f;--t:#e8eaf6;--d:#7f93a8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:radial-gradient(110% 60% at 50% 45%,#0b2a4a 0%,var(--bg) 65%);overflow:hidden;border-radius:14px}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .5s;padding:26px 18px 0}
+.sc.on{opacity:1}
+h1{font-size:38px;line-height:1.02;margin:160px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;color:var(--r);text-shadow:0 0 24px var(--r)}
+.sub{color:var(--d);font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 4px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:4px;padding:11px 12px;border:1px solid #1d3a5a;border-radius:12px;font-size:12px;line-height:1.5;background:#071420;transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(255,59,78,.1);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(57,255,136,.08);color:var(--g)}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+.ln{padding:14px 12px;border-radius:12px;border:1px solid #1d3a5a;background:#071420;font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+svg text{font-family:inherit}
+.k circle{fill:#0e1b2c;stroke:#4a6a8a;stroke-width:1.5;transition:all .3s}
+.k.sig circle{fill:#ffd23f;stroke:#ffd23f;filter:drop-shadow(0 0 5px #ffd23f)}
+.k.bad circle{fill:#ff3b4e;stroke:#ff3b4e;filter:drop-shadow(0 0 6px #ff3b4e)}
+#gate rect{transition:all .3s}
+#gate.bad rect{stroke:#ff3b4e;filter:drop-shadow(0 0 8px #ff3b4e)}
+#atk{opacity:0;transition:opacity .5s}#atk.on{opacity:1}
+#stamp{opacity:0;transition:opacity .4s}#stamp.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+ <section class="sc" id="s0">
+  <h1>The bridge<br>that minted<br><em>money</em> from nothing.</h1>
+  <div class="sub">How cross-chain bridges work, and how stealing a few keys breaks them.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>Cross-chain bridge hack</h2>
+  <svg viewBox="0 0 324 430" width="324" height="430">
+   <defs><filter id="gw"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+   <rect x="30" y="6" width="240" height="104" rx="18" fill="#08202e" stroke="#29d9ff" stroke-width="2"/>
+   <text x="42" y="24" fill="#29d9ff" font-size="9">CHAIN A</text>
+   <text x="150" y="50" fill="#e8eaf6" font-size="11" text-anchor="middle">🔒 BRIDGE VAULT</text>
+   <text id="va" x="150" y="82" fill="#29d9ff" font-size="22" font-weight="700" text-anchor="middle">1,000</text>
+   <text x="150" y="98" fill="#7f93a8" font-size="8" text-anchor="middle">real ETH locked</text>
+   <g stroke="#2a5a7a" stroke-width="2"><path d="M138 110V300M162 110V300"/></g>
+   <g stroke="#1d3a5a" stroke-width="3"><path d="M134 130H166M134 160H166M134 190H166M134 245H166M134 275H166"/></g>
+   <g id="gate"><rect x="86" y="205" width="152" height="32" rx="9" fill="#0a1626" stroke="#4a6a8a" stroke-width="1.8"/></g>
+   <g id="ks"></g>
+   <text x="162" y="251" fill="#7f93a8" font-size="8" text-anchor="middle">guardians: 3-of-5 signatures</text>
+   <rect x="30" y="300" width="240" height="104" rx="18" fill="#170f2e" stroke="#b46bff" stroke-width="2"/>
+   <text x="42" y="318" fill="#b46bff" font-size="9">CHAIN B</text>
+   <text x="150" y="342" fill="#e8eaf6" font-size="11" text-anchor="middle">🪙 wrapped ETH (wETH)</text>
+   <text id="vb" x="150" y="376" fill="#b46bff" font-size="22" font-weight="700" text-anchor="middle">1,000</text>
+   <text x="150" y="392" fill="#7f93a8" font-size="8" text-anchor="middle">wETH in circulation</text>
+   <text x="298" y="124" fill="#7f93a8" font-size="7" text-anchor="middle">BACKING</text>
+   <rect x="290" y="132" width="16" height="160" rx="4" fill="#0a1626" stroke="#2a4a6a"/>
+   <rect id="mt" x="291" y="133" width="14" height="158" rx="3" fill="#39ff88"/>
+   <text id="mr" x="298" y="306" fill="#39ff88" font-size="11" font-weight="700" text-anchor="middle">1.00</text>
+   <g id="atk"><text x="298" y="60" font-size="26" text-anchor="middle">🕵</text><text x="298" y="78" fill="#ff3b4e" font-size="8" text-anchor="middle">attacker</text></g>
+   <g id="cr" filter="url(#gw)"></g>
+   <g id="stamp"><text x="162" y="168" fill="#ff3b4e" font-size="26" font-weight="900" text-anchor="middle" transform="rotate(-10 162 160)" style="paint-order:stroke;stroke:#030a14;stroke-width:5px">DRAINED</text></g>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:34px;font-size:24px">What to learn</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🔑 <b>Few keys, big risk.</b> A small guardian set is a single point of failure.</div>
+   <div class="ln" id="l2">🧾 <b>Verify on-chain.</b> Prefer cryptographic proofs over trusting signers.</div>
+   <div class="ln" id="l3">🪙 <b>Wrapped means borrowed trust.</b> A token is only as safe as its bridge.</div>
+   <div class="ln" id="l4">🚦 <b>Limit blast radius.</b> Rate limits, monitoring, audits.</div>
+  </div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+const K5=[0,1,2,3,4].map(i=>{const g=mk('g',{class:'k'},$('#ks'));mk('circle',{cx:112+i*25,cy:221,r:7},g);return g});
+let vault=1000,supply=1000;
+const fmt=v=>Math.round(v).toLocaleString('en-US');
+function setBack(){const r=Math.max(0,Math.min(1,vault/supply)),h=158*r;
+ const m=$('#mt');m.setAttribute('y',291-h);m.setAttribute('height',Math.max(0,h));
+ const col=r>.8?'#39ff88':r>.3?'#ff8a3d':'#ff3b4e';m.setAttribute('fill',col);
+ $('#mr').textContent=r.toFixed(2);$('#mr').setAttribute('fill',col)}
+function paint(){$('#va').textContent=fmt(vault);$('#vb').textContent=fmt(supply);setBack()}
+function tween(a,b,ms,fn){return new Promise(res=>{const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/ms),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(t0)})}
+function fly(col,x0,y0,x1,y1,ms,delay=0){return sleep(delay).then(()=>{const r=mk('rect',{width:12,height:12,rx:2,fill:col},$('#cr'));
+ return tween(0,1,ms,p=>{r.setAttribute('x',x0+(x1-x0)*p-6);r.setAttribute('y',y0+(y1-y0)*p-6)}).then(()=>r.remove())})}
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+function reset(){vault=1000;supply=1000;paint();K5.forEach(k=>k.setAttribute('class','k'));$('#gate').classList.remove('bad');
+ $('#atk').classList.remove('on');$('#stamp').classList.remove('on');note('Lock-and-mint: lock ETH on chain A, guardians sign, wrapped ETH is minted on chain B.')}
+async function deposit(n){
+ await fly('#29d9ff',150,70,162,205,900);
+ [0,1,2].forEach(i=>K5[i].classList.add('sig'));await sleep(500);
+ vault+=n;paint();
+ await Promise.all([fly('#b46bff',162,237,150,330,800)]);supply+=n;paint();
+ K5.forEach(k=>k.classList.remove('sig'))}
+async function main(){
+ reset();scene('s1');await sleep(2800);
+ note('Honest case: Alice locks 10 ETH. Three guardians sign. 10 wETH appears on chain B.');await deposit(10);
+ note('Every wETH is backed 1:1 by locked ETH.','good');await sleep(1800);
+ $('#atk').classList.add('on');
+ note('Attacker steals 3 of the 5 guardian keys.','bad');
+ K5.forEach((k,i)=>{if(i<3)k.classList.add('bad')});$('#gate').classList.add('bad');await sleep(2000);
+ note('He signs a forged message: “mint 4,000 wETH.” No ETH was ever deposited.','bad');await sleep(1600);
+ stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),950);
+ const fl=[];for(let i=0;i<8;i++)fl.push(fly('#ff3b4e',162,237,150,330,700,i*140));
+ const s0=supply;fl.push(tween(0,1,1400,p=>{supply=s0+4000*p;setBack();$('#vb').textContent=fmt(supply)}));
+ await Promise.all(fl);
+ note('Chain B now has 5× more wETH than ETH locked. The backing ratio crashes to 0.20.','bad');await sleep(2400);
+ note('He burns the fake wETH and withdraws the real ETH from the vault.','bad');
+ const f2=[];for(let i=0;i<8;i++)f2.push(fly('#ff3b4e',150,70,298,50,900,i*150));
+ const v0=vault;f2.push(tween(0,1,1700,p=>{vault=v0*(1-p);$('#va').textContent=fmt(vault);setBack()}));
+ await Promise.all(f2);
+ $('#stamp').classList.add('on');
+ note('Vault empty. Every wETH on chain B is now backed by nothing.','bad');await sleep(3400);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of [1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ await sleep(1400);scene('s0');
+}
+paint();
+(async()=>{while(true){scene('s0');await sleep(3200);await main()}})();
+</script>
+</body>
+</html>
