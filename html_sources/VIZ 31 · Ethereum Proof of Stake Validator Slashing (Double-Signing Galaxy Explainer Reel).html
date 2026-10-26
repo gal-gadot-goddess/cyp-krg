@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Ethereum Proof of Stake · Validator Slashing Explained (Galaxy Visualization)</title>
+<style>
+:root{--bg:#03040c;--c:#29d9ff;--v:#9b6bff;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#e8eef8;--d:#7f93b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:300px;height:300px;left:-100px;top:60px;background:#2a1b9a}
+.b2{width:260px;height:260px;right:-110px;top:300px;background:#0b6a8a;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#7a1b6a;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:34px;line-height:1.05;margin:150px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--o),var(--r));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(255,59,78,.8))}
+.sub{color:#b4c4e0;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #1d3458;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(6,12,28,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,46,6,.86);color:#ffe9a8}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #1d3458;background:rgba(6,12,28,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+.big{margin-top:20px;font-size:23px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--c),var(--m));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.fd{opacity:0;transition:opacity .4s}.fd.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>Cheat once.<br>Lose your <em>stake.</em></h1>
+  <div class="sub">Ethereum proof of stake: how validators earn trust, and how slashing punishes betrayal.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>Validators and slashing</h2>
+  <svg viewBox="0 0 324 450" width="324" height="450">
+   <defs>
+    <radialGradient id="cg" cx=".4" cy=".35" r=".85"><stop offset="0" stop-color="#e6f9ff"/><stop offset=".5" stop-color="#29d9ff"/><stop offset="1" stop-color="#1a2a7a"/></radialGradient>
+    <filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   </defs>
+   <g id="halos"></g><g id="vals"></g>
+   <g id="bm" filter="url(#gw)"></g>
+   <g id="core">
+    <circle cx="162" cy="200" r="36" fill="none" stroke="#1a2a5a" stroke-width="5"/>
+    <circle id="ring" cx="162" cy="200" r="36" fill="none" stroke="#29d9ff" stroke-width="5" stroke-linecap="round" transform="rotate(-90 162 200)" stroke-dasharray="226.2" stroke-dashoffset="226.2" filter="url(#gw)"/>
+    <path d="M162 160V168" stroke="#ffd23f" stroke-width="2" transform="rotate(240 162 200)"/>
+    <circle id="orb" cx="162" cy="200" r="25" fill="url(#cg)" filter="url(#gw)"/>
+    <text x="162" y="196" fill="#04122a" font-size="7" font-weight="700" text-anchor="middle" letter-spacing="1">SLOT</text>
+    <text id="sn" x="162" y="210" fill="#04122a" font-size="14" font-weight="700" text-anchor="middle">1</text>
+   </g>
+   <text id="vl" class="fd" x="0" y="0" fill="#ff8a97" font-size="8" font-weight="700" text-anchor="middle" style="paint-order:stroke;stroke:#03040c;stroke-width:3px">VALIDATOR #42</text>
+   <g id="parts"></g>
+   <rect x="6" y="360" width="152" height="80" rx="12" fill="rgba(6,12,28,.88)" stroke="#1d3458"/>
+   <text x="16" y="376" fill="#7f93b0" font-size="7.5" letter-spacing="1">VALIDATOR #42 STAKE</text>
+   <text id="sk" x="16" y="406" fill="#39ff88" font-size="24" font-weight="700">32 ETH</text>
+   <text id="sd" x="16" y="428" fill="#39ff88" font-size="8.5">ACTIVE · earning rewards</text>
+   <rect x="166" y="360" width="152" height="80" rx="12" fill="rgba(6,12,28,.88)" stroke="#1d3458"/>
+   <text x="176" y="376" fill="#7f93b0" font-size="7.5" letter-spacing="1">CHAIN STATUS</text>
+   <text id="cs" x="176" y="400" fill="#29d9ff" font-size="12" font-weight="700">SLOT 1</text>
+   <text id="cd" x="176" y="420" fill="#7f93b0" font-size="8.5">waiting for a proposal…</text>
+   <g id="stamp" class="fd"><text id="stt" x="162" y="345" fill="#ff3b4e" font-size="24" font-weight="900" text-anchor="middle" transform="rotate(-6 162 340)" style="paint-order:stroke;stroke:#03040c;stroke-width:5px">SLASHED</text></g>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">Why it works</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🔒 <b>32 ETH at stake.</b> Every validator has skin in the game.</div>
+   <div class="ln" id="l2">🗳 <b>Honest work pays.</b> Proposing and attesting correctly earns rewards.</div>
+   <div class="ln" id="l3">⚔ <b>Slashing.</b> Double-signing loses stake and gets the validator ejected.</div>
+   <div class="ln" id="l4">📈 <b>Correlation penalty.</b> The more validators slashed together, the bigger each penalty.</div>
+  </div>
+  <div class="big" id="bg">Skin in the game.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#d9b8ff':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+/* ---------- validator galaxy ---------- */
+const CX=162,CY=200,NV=64,V=[],OFF=41;
+for(let i=0;i<NV;i++){const arm=i%4,k=Math.floor(i/4)/16,r=52+k*92+(Math.random()-.5)*10,th0=arm*Math.PI/2+k*3.4+(Math.random()-.5)*.35;
+ V.push({r,th0,x:0,y:0,st:'idle',vis:0,flash:0,ph:Math.random()*6.28,
+  h:mk('circle',{r:7,fill:'#29d9ff',opacity:0},$('#halos')),e:mk('circle',{r:2.4,fill:'#7ad8ff',opacity:0},$('#vals'))})}
+let rot=0,beams=[],parts=[],coreFlash=0,coreShake=0,t0=performance.now(),last=performance.now();
+function colorOf(v){return v.st==='bad'||v.st==='dying'?'#ff3b4e':v.st==='prop'?'#ffd23f':'#7ad8ff'}
+function frame(now){const dt=Math.min(.05,(now-last)/1000),t=(now-t0)/1000;last=now;rot+=dt*.04;
+ for(const v of V){const a=v.th0+rot,sh=v.st==='dying'?(Math.random()-.5)*4:0;v.x=CX+v.r*Math.cos(a)+sh;v.y=CY+v.r*Math.sin(a)+sh;
+  const big=v.st==='bad'||v.st==='dying'?5:v.st==='prop'?5:2.4,tw=.65+.35*Math.sin(t*2+v.ph);
+  v.flash=Math.max(0,v.flash-dt*2.2);
+  const rr=(big+v.flash*3)*(v.vis?1:0);v.e.setAttribute('cx',v.x);v.e.setAttribute('cy',v.y);v.e.setAttribute('r',Math.max(0,rr));
+  v.e.setAttribute('fill',v.flash>.3&&v.st==='idle'?'#ffffff':colorOf(v));v.e.setAttribute('opacity',v.vis?(v.st==='idle'?tw:1):0);
+  const hv=(v.st!=='idle'?.35:0)+v.flash*.5;v.h.setAttribute('cx',v.x);v.h.setAttribute('cy',v.y);v.h.setAttribute('r',rr*3+2);v.h.setAttribute('fill',colorOf(v));v.h.setAttribute('opacity',v.vis?hv:0)}
+ const vl=$('#vl');if(vl.classList.contains('on')){vl.setAttribute('x',V[OFF].x);vl.setAttribute('y',V[OFF].y-12)}
+ const px=CX+(coreShake>0?(Math.random()-.5)*5:0);coreShake=Math.max(0,coreShake-dt);coreFlash=Math.max(0,coreFlash-dt*2);
+ $('#orb').setAttribute('r',25+coreFlash*7);$('#orb').setAttribute('cx',px);
+ beams=beams.filter(b=>{const p=(now-b.s)/b.d,A=b.a<0?{x:CX,y:CY}:V[b.a],B=b.b<0?{x:CX,y:CY}:V[b.b];
+  if(p<1){const hx=A.x+(B.x-A.x)*p,hy=A.y+(B.y-A.y)*p;b.l.setAttribute('x1',A.x);b.l.setAttribute('y1',A.y);b.l.setAttribute('x2',hx);b.l.setAttribute('y2',hy);b.h.setAttribute('cx',hx);b.h.setAttribute('cy',hy);return true}
+  if(!b.done){b.done=true;b.cb&&b.cb();b.h.setAttribute('opacity',0)}
+  const q=(p-1)/.5;if(q>=1){b.l.remove();b.h.remove();return false}
+  b.l.setAttribute('x1',A.x);b.l.setAttribute('y1',A.y);b.l.setAttribute('x2',B.x);b.l.setAttribute('y2',B.y);b.l.setAttribute('opacity',1-q);return true});
+ parts=parts.filter(q=>{q.x+=q.vx;q.y+=q.vy;q.vy+=q.g;q.l-=q.dc;if(q.l<=0){q.e.remove();return false}q.e.setAttribute('cx',q.x);q.e.setAttribute('cy',q.y);q.e.setAttribute('opacity',q.l);return true});
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function beam(a,b,col,ms,cb){const l=mk('line',{stroke:col,'stroke-width':1.6,'stroke-linecap':'round'},$('#bm')),h=mk('circle',{r:3,fill:'#fff'},$('#bm'));beams.push({a,b,s:performance.now(),d:ms,l,h,cb,done:false,col})}
+function burst(x,y,c,n=14,sp=2.6,g=.03){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g,l:1,dc:.025,e:mk('circle',{r:1.2+Math.random()*2.2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const s=performance.now();(function f(t){const p=Math.min(1,(t-s)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(s)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+function setRing(f,col){$('#ring').setAttribute('stroke-dashoffset',226.2*(1-f));$('#ring').setAttribute('stroke',col||(f>=.667?'#39ff88':'#29d9ff'))}
+function chain(a,b){$('#cs').textContent=a;$('#cd').textContent=b}
+const pick=(n,ex=-1)=>{const ids=[...V.keys()].filter(i=>i!==ex&&V[i].st==='idle').sort(()=>Math.random()-.5);return ids.slice(0,n)};
+function reset(){for(const v of V){v.st='idle';v.vis=0;v.flash=0}beams.forEach(b=>{b.l.remove();b.h.remove()});beams=[];setRing(0);$('#sn').textContent='1';
+ $('#sk').textContent='32 ETH';$('#sk').setAttribute('fill','#39ff88');$('#sd').textContent='ACTIVE · earning rewards';$('#sd').setAttribute('fill','#39ff88');chain('SLOT 1','waiting for a proposal…');
+ ['#vl','#stamp'].forEach(s=>$(s).classList.remove('on'));$('#bg').classList.remove('on');coreShake=0;coreFlash=0}
+async function honestSlot(n,fast){
+ $('#sn').textContent=n;setRing(0);chain('SLOT '+n,'proposer chosen…');const pr=pick(1)[0],pv=V[pr];pv.st='prop';
+ await sleep(fast?400:900);chain('SLOT '+n,'block proposed');beam(pr,-1,'#ffd23f',fast?450:750,()=>{coreFlash=1;burst(CX,CY,'#ffd23f',10,2)});await sleep(fast?600:1000);pv.st='idle';
+ const com=pick(36);let a=0;chain('SLOT '+n,'committee attesting…');
+ com.forEach((i,k)=>{setTimeout(()=>{V[i].flash=1;beam(i,-1,'#29d9ff',fast?350:500,()=>{a++;setRing(a/36*.86);if(a===36){coreFlash=1.2;chain('SLOT '+n,'≥ 2/3 attested ✔');burst(CX,CY,'#39ff88',16,2.4)}});
+   const g=mk('circle',{r:2,fill:'#39ff88',filter:'url(#gw)',cx:V[i].x,cy:V[i].y},$('#parts'));parts.push({x:V[i].x,y:V[i].y,vx:0,vy:-.7,g:0,l:1,dc:.03,e:g})},k*(fast?14:26))});
+ await sleep(fast?1300:2200)}
+async function main(){
+ reset();scene('s1');note('Ethereum validators each lock 32 ETH as a stake. They take turns proposing blocks and voting on them.');
+ for(const v of V){v.vis=1;await sleep(28)}await sleep(1800);
+ note('Every 12-second slot, one validator is chosen to propose a block.','warn');await honestSlot(1,false);
+ note('A committee of validators attests that the block is valid. Once two-thirds of the stake agrees, it moves toward finality, and honest validators earn rewards.','good');await sleep(2200);
+ await honestSlot(2,true);chain('SLOT 2','✔ justified');await sleep(800);
+ /* attack */
+ const o=V[OFF];o.st='bad';$('#vl').classList.add('on');coreShake=.5;setRing(0);
+ note('But validator #42 turns malicious: it signs two conflicting blocks for the same slot, trying to fork the chain.','bad');await sleep(2000);
+ chain('SLOT 3','⚠ conflicting votes');$('#sn').textContent='3';
+ beam(OFF,-1,'#29d9ff',800);beam(OFF,-1,'#ff5fd2',800,()=>{coreShake=.9;coreFlash=1.5;setRing(.5,'#ff3b4e');burst(CX,CY,'#ff3b4e',24,3);stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),700)});await sleep(2200);
+ note('Anyone can spot it. Other validators submit the two signatures as proof, and it’s recorded on-chain as slashing evidence.','warn');
+ const ev=pick(6,OFF);ev.forEach((i,k)=>setTimeout(()=>{V[i].flash=1;beam(i,OFF,'#ff9d3d',600,()=>{o.flash=1})},k*220));chain('SLOT 3','slashing evidence submitted');await sleep(2600);
+ /* slash */
+ note('Slashed! The validator is penalized immediately, then forced to exit, and its stake keeps leaking.','bad');o.st='dying';
+ await sleep(1100);burst(o.x,o.y,'#ff3b4e',46,3.6,.02);burst(o.x,o.y,'#ffd23f',20,2.6,.04);o.st='dead';o.vis=0;stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),900);
+ $('#vl').classList.remove('on');$('#sk').textContent='31 ETH';$('#sk').setAttribute('fill','#ff9d3d');$('#sd').textContent='SLASHED · −1 ETH · EJECTED';$('#sd').setAttribute('fill','#ff3b4e');
+ $('#stt').textContent='SLASHED';$('#stamp').classList.add('on');chain('SLOT 3','✔ conflict rejected, chain intact');setRing(0);await sleep(3000);
+ $('#stamp').classList.remove('on');
+ /* correlation */
+ note('And if many validators are slashed together, the penalty grows. If a third of the network is, each loses the whole 32 ETH.','bad');
+ const grp=pick(22);for(const i of grp){V[i].st='bad';V[i].flash=1;await sleep(70)}await sleep(900);
+ stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),900);
+ for(const i of grp){V[i].st='dying';burst(V[i].x,V[i].y,'#ff3b4e',10,2.4,.03);V[i].st='dead';V[i].vis=0;await sleep(55)}
+ $('#sk').textContent='0 ETH';$('#sk').setAttribute('fill','#ff3b4e');$('#sd').textContent='CORRELATION PENALTY · −32 ETH';await sleep(2800);
+ for(const v of V)if(v.st==='dead'){v.st='idle';v.vis=1;v.flash=1}
+ note('The honest majority keeps the chain safe, and cheating costs far more than it could ever win.','good');setRing(.86);chain('SLOT 4','✔ chain finalizes');await sleep(3200);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>

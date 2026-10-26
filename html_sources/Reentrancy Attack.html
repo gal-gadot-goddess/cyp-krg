@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Reentrancy Attack</title>
+<style>
+:root{--bg:#04030c;--c:#29d9ff;--v:#9b6bff;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#ece8f8;--d:#8f86b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px;transition:filter .5s}
+#stage.rw{filter:hue-rotate(150deg) saturate(1.5) brightness(1.1)}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;left:-90px;top:120px;background:#3a1b9a}
+.b2{width:250px;height:250px;right:-100px;top:340px;background:#8a1b6a;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#0b5a8a;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:31px;line-height:1.06;margin:150px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--c),var(--m));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(255,95,210,.8))}
+.sub{color:#bdb3dc;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #2e2460;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(12,8,30,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,46,6,.86);color:#ffe9a8}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #2e2460;background:rgba(12,8,30,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+.big{margin-top:20px;font-size:23px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--c),var(--m));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.cd{fill:#e8e4ff;font-size:8.6px}
+.an{fill:#6a6090;font-size:7.5px;text-anchor:end}
+.fadeo{opacity:0;transition:opacity .3s}.fadeo.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>One withdraw.<br>Ten <em>withdrawals.</em></h1>
+  <div class="sub">Reentrancy: the bug that lets a contract call itself dry.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>The reentrancy attack</h2>
+  <svg viewBox="0 0 324 446" width="324" height="446">
+   <defs>
+    <filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   </defs>
+   <rect x="6" y="4" width="312" height="104" rx="12" fill="rgba(8,6,24,.9)" stroke="#2e2460"/>
+   <text x="14" y="17" fill="#9b6bff" font-size="8" letter-spacing="1" id="ttl">Vault.sol · VULNERABLE</text>
+   <rect id="hl" x="10" y="23" width="304" height="14" rx="4" fill="rgba(255,210,63,.18)" stroke="#ffd23f" stroke-width="1" opacity="0"/>
+   <text class="cd" x="16" y="34">function withdraw() {</text>
+   <text class="cd" x="16" y="49">  uint amt = balances[msg.sender];</text>
+   <g id="gA"><text class="cd" x="16" y="64">  msg.sender.call{value: amt}("");</text><text class="an" x="312" y="64" id="aA">① send ETH</text></g>
+   <g id="gB"><text class="cd" x="16" y="79">  balances[msg.sender] = 0;</text><text class="an" x="312" y="79" id="aB">② update ledger</text></g>
+   <text class="cd" x="16" y="94">}</text>
+   <g id="tun"></g>
+   <text id="dp" x="162" y="229" fill="#fff" font-size="13" font-weight="700" text-anchor="middle" style="paint-order:stroke;stroke:#04030c;stroke-width:4px;filter:drop-shadow(0 0 8px #ff5fd2)">DEPTH 0</text>
+   <text id="rc" class="fadeo" x="162" y="126" fill="#ff8a97" font-size="8.5" text-anchor="middle">attacker.receive() → withdraw() again!</text>
+   <text id="rv" class="fadeo" x="162" y="250" fill="#ff3b4e" font-size="10" font-weight="700" text-anchor="middle" style="paint-order:stroke;stroke:#04030c;stroke-width:4px">REVERT: nothing to withdraw</text>
+   <rect x="6" y="342" width="150" height="98" rx="12" fill="rgba(6,20,36,.9)" stroke="#29d9ff" stroke-width="1.5"/>
+   <text x="16" y="358" fill="#29d9ff" font-size="8.5" letter-spacing="1.5">🏦 VAULT</text>
+   <text id="vb" x="81" y="392" fill="#fff" font-size="24" font-weight="700" text-anchor="middle">100</text>
+   <text x="81" y="405" fill="#8f86b0" font-size="7.5" text-anchor="middle">ETH held</text>
+   <text id="lg" x="81" y="426" fill="#ff9d3d" font-size="8.5" text-anchor="middle">ledger[attacker] = 10</text>
+   <rect x="168" y="342" width="150" height="98" rx="12" fill="rgba(36,6,16,.9)" stroke="#ff3b4e" stroke-width="1.5"/>
+   <text x="178" y="358" fill="#ff3b4e" font-size="8.5" letter-spacing="1.5">🕵 ATTACKER</text>
+   <text id="aw" x="243" y="392" fill="#ff8a97" font-size="24" font-weight="700" text-anchor="middle">0</text>
+   <text x="243" y="405" fill="#8f86b0" font-size="7.5" text-anchor="middle">ETH stolen</text>
+   <text id="ad" x="243" y="426" fill="#8f86b0" font-size="8.5" text-anchor="middle">deposited 10 ETH</text>
+   <g id="parts"></g>
+   <g id="stamp" class="fadeo"><text id="stt" x="162" y="300" fill="#ff3b4e" font-size="28" font-weight="900" text-anchor="middle" transform="rotate(-8 162 292)" style="paint-order:stroke;stroke:#04030c;stroke-width:5px;letter-spacing:.04em">DRAINED</text></g>
+   <text id="rwt" x="162" y="225" fill="#29d9ff" font-size="22" font-weight="900" text-anchor="middle" opacity="0" style="paint-order:stroke;stroke:#04030c;stroke-width:4px;letter-spacing:.08em">⏪ REWIND</text>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">How to prevent it</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🔁 <b>External calls can call you back.</b> Never assume you’ll finish first.</div>
+   <div class="ln" id="l2">📒 <b>Checks, effects, interactions.</b> Update state before sending ETH.</div>
+   <div class="ln" id="l3">🔒 <b>Reentrancy guard.</b> A mutex locks the function during execution.</div>
+   <div class="ln" id="l4">🔍 <b>Audit and test</b> with malicious contracts that call you back.</div>
+  </div>
+  <div class="big" id="bg">Finish your bookkeeping first.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#d9b8ff':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+const TX=162,TY=225,FR=[];
+for(let k=0;k<10;k++){const hue=190+k*17,w=282*Math.pow(.8,k),h=176*Math.pow(.8,k),g=mk('g',{opacity:0},$('#tun'));
+ mk('rect',{x:TX-w/2,y:TY-h/2,width:w,height:h,rx:Math.max(6,16*Math.pow(.85,k)),fill:`hsla(${hue},100%,55%,.07)`,stroke:`hsl(${hue},100%,62%)`,'stroke-width':2,filter:'url(#gw)'},g);FR.push(g)}
+function setF(k,s,op){const g=FR[k];g.setAttribute('transform',`translate(${TX} ${TY}) rotate(${k*5.5}) scale(${s}) translate(${-TX} ${-TY})`);g.setAttribute('opacity',op)}
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(t0)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+const pushF=(k,ms)=>tween(0,1,ms,p=>setF(k,1.35-.35*p,p),eio);
+const popF=(k,ms,out=false)=>tween(0,1,ms,p=>setF(k,1+.3*p,1-p),eio);
+let parts=[];
+function spark(x,y,c,n=10,sp=2.4){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1,e:mk('circle',{r:1.2+Math.random()*2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+function frame(){parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.03;p.l-=.03;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function fly(x0,y0,x1,y1,col,ms,arc=-40){const c=mk('circle',{r:4,fill:col,filter:'url(#gw)'},$('#parts')),mx=(x0+x1)/2,my=(y0+y1)/2+arc;
+ return tween(0,1,ms,p=>{const q=1-p,x=q*q*x0+2*q*p*mx+p*p*x1,y=q*q*y0+2*q*p*my+p*p*y1;c.setAttribute('cx',x);c.setAttribute('cy',y)},eio).then(()=>{c.remove();spark(x1,y1,col,6,1.8)})}
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+const ROW=[34,49,64,79,94];
+function hl(r){const e=$('#hl');if(r<0){e.setAttribute('opacity',0);return}e.setAttribute('opacity',1);e.setAttribute('y',ROW[r]-11)}
+let vault=100,stolen=0;
+function setV(v){vault=v;$('#vb').textContent=v}function setS(v){stolen=v;$('#aw').textContent=v}
+function reset(){FR.forEach((g,k)=>setF(k,1,0));$('#dp').textContent='DEPTH 0';['#rc','#rv','#stamp'].forEach(s=>$(s).classList.remove('on'));hl(-1);setV(90);setS(0);
+ $('#lg').textContent='ledger[attacker] = 0';$('#lg').setAttribute('fill','#8f86b0');$('#ad').textContent='about to deposit 10 ETH';$('#bg').classList.remove('on');
+ $('#gA').setAttribute('transform','');$('#gB').setAttribute('transform','');$('#ttl').textContent='Vault.sol · VULNERABLE';$('#ttl').setAttribute('fill','#9b6bff');
+ $('#aA').textContent='① send ETH';$('#aB').textContent='② update ledger';$('#stt').textContent='DRAINED';$('#stt').setAttribute('fill','#ff3b4e');stage.classList.remove('rw');$('#rwt').setAttribute('opacity',0)}
+async function deposit(){await fly(243,392,81,392,'#ffd23f',700);setV(100);$('#lg').textContent='ledger[attacker] = 10';$('#lg').setAttribute('fill','#ff9d3d');$('#ad').textContent='deposited 10 ETH'}
+
+async function main(){
+ reset();scene('s1');note('A vault lets users deposit and withdraw ETH. It keeps a ledger of who is owed what.');await sleep(3000);
+ await deposit();note('The attacker deposits 10 ETH, then calls withdraw().','warn');await sleep(2000);
+ let depth=0;
+ for(let k=0;k<10;k++){const sp=k<3?1:.32;
+  await pushF(k,380*sp);depth=k+1;$('#dp').textContent='DEPTH '+depth;
+  if(k==0)note('Line ① sends the ETH first. The ledger update (line ②) comes after.','warn');
+  hl(1);await sleep(260*sp);hl(2);
+  if(k==0){await sleep(900);note('Sending ETH triggers the attacker’s receive() function…','bad')}
+  const f=fly(81,392,243,392,'#ff3b4e',520*sp);
+  await sleep(280*sp);setV(100-10*(k+1));setS(10*(k+1));
+  if(k==0){$('#rc').classList.add('on');await sleep(600)}
+  if(k==1)note('…which calls withdraw() again. The ledger still says 10, so it pays out again!','bad');
+  if(k==3)note('Each nested call sees the same stale balance, so every call pays out. Faster and faster…','bad');
+  await f;
+  if(k==5){stage.classList.remove('gl');void stage.offsetWidth;stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),600)}}
+ $('#rc').classList.remove('on');hl(-1);await sleep(500);
+ note('The vault is empty after 10 nested calls. Only now does line ② run, as the stack unwinds. Too late.','bad');
+ $('#lg').textContent='ledger[attacker] = 0 (too late)';$('#lg').setAttribute('fill','#8f86b0');
+ for(let k=9;k>=0;k--){hl(3);$('#dp').textContent='DEPTH '+k;await popF(k,200);hl(-1)}
+ stage.classList.remove('gl');void stage.offsetWidth;stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),900);
+ $('#stamp').classList.add('on');await sleep(3200);
+ /* rewind: fixed version */
+ $('#stamp').classList.remove('on');stage.classList.add('rw');$('#rwt').setAttribute('opacity',1);await sleep(1200);
+ reset();stage.classList.add('rw');$('#rwt').setAttribute('opacity',1);await sleep(500);stage.classList.remove('rw');$('#rwt').setAttribute('opacity',0);
+ note('Rewind. Same vault, but the developer swaps the order: update the ledger first, then send.','good');
+ await tween(0,15,800,v=>{$('#gA').setAttribute('transform',`translate(0 ${v})`);$('#gB').setAttribute('transform',`translate(0 ${-v})`)},eio);
+ $('#ttl').textContent='Vault.sol · FIXED';$('#ttl').setAttribute('fill','#39ff88');$('#aA').textContent='② send ETH';$('#aB').textContent='① update ledger';hl(2);await sleep(1500);hl(-1);
+ await deposit();note('The attacker deposits 10 ETH again and calls withdraw().','warn');await sleep(1600);
+ await pushF(0,380);$('#dp').textContent='DEPTH 1';hl(1);await sleep(500);
+ hl(2);$('#lg').textContent='ledger[attacker] = 0';$('#lg').setAttribute('fill','#39ff88');note('The ledger is zeroed BEFORE any ETH moves.','good');await sleep(1400);
+ hl(3);await fly(81,392,243,392,'#39ff88',600);setV(90);setS(10);await sleep(300);
+ note('The attacker’s receive() calls withdraw() again…','warn');await pushF(1,380);$('#dp').textContent='DEPTH 2';hl(1);$('#rc').classList.add('on');await sleep(900);
+ $('#rv').classList.add('on');spark(162,250,'#ff3b4e',20,3);note('…but the ledger already says 0, so the nested call reverts. The attacker only gets their own 10 ETH back.','good');await sleep(1200);
+ await popF(1,300);$('#dp').textContent='DEPTH 1';$('#rc').classList.remove('on');$('#rv').classList.remove('on');await popF(0,300);$('#dp').textContent='DEPTH 0';hl(-1);
+ $('#stt').textContent='SAFE ✔';$('#stt').setAttribute('fill','#39ff88');$('#stamp').classList.add('on');await sleep(3000);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>

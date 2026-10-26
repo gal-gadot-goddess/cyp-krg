@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Lightning Network</title>
+<style>
+:root{--bg:#030610;--c:#29d9ff;--y:#ffe14a;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--t:#e8eef8;--d:#7f93b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;left:-90px;top:80px;background:#0b3a8a}
+.b2{width:250px;height:250px;right:-100px;top:340px;background:#6a4a00;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#5a1b8a;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:32px;line-height:1.05;margin:150px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--y),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(255,225,74,.8))}
+.sub{color:#b4c4e0;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #1d3458;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(6,12,28,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,50,6,.86);color:#fff0a8}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #1d3458;background:rgba(6,12,28,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--y)}
+.big{margin-top:20px;font-size:23px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--y),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.nd{opacity:0;transition:opacity .4s}.nd.on{opacity:1}
+.nd circle.b{fill:#0a1230;stroke:#29d9ff;stroke-width:1.8;transition:all .3s}
+.nd text.l{fill:#cfe6ff;font-size:9px;font-weight:700;text-anchor:middle}
+.nd text.nm{fill:#7f93b0;font-size:7.5px;text-anchor:middle;letter-spacing:.8px}
+.nd.hot circle.b{stroke:#ffe14a;filter:drop-shadow(0 0 8px #ffe14a)}
+.nd.off circle.b{stroke:#ff3b4e;fill:#2a0a12;filter:drop-shadow(0 0 8px #ff3b4e)}
+.nd.ok circle.b{stroke:#39ff88;filter:drop-shadow(0 0 9px #39ff88)}
+.ed{opacity:0;transition:opacity .5s}.ed.on{opacity:1}
+.fade{opacity:0;transition:opacity .4s}.fade.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>Bitcoin payments<br>at the speed<br>of <em>lightning.</em></h1>
+  <div class="sub">How the Lightning Network routes a payment across strangers without touching the blockchain.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>The Lightning Network</h2>
+  <svg viewBox="0 0 324 450" width="324" height="450">
+   <defs><filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+   <rect x="6" y="2" width="312" height="40" rx="11" fill="rgba(6,12,28,.88)" stroke="#1d3458"/>
+   <text id="b1" x="16" y="19" fill="#e8eef8" font-size="10">…</text>
+   <text id="b2" x="16" y="34" fill="#7f93b0" font-size="8.5"></text>
+   <g id="edges"></g><g id="routes"></g><g id="locks"></g><g id="nodes"></g><g id="fx" filter="url(#gw)"></g><g id="parts"></g>
+   <rect x="6" y="410" width="152" height="36" rx="10" fill="rgba(6,12,28,.88)" stroke="#1d3458"/>
+   <text x="16" y="424" fill="#7f93b0" font-size="7.5" letter-spacing="1">OFF-CHAIN PAYMENTS</text>
+   <text id="pc" x="16" y="440" fill="#ffe14a" font-size="14" font-weight="700">0</text>
+   <rect x="166" y="410" width="152" height="36" rx="10" fill="rgba(6,12,28,.88)" stroke="#1d3458"/>
+   <text x="176" y="424" fill="#7f93b0" font-size="7.5" letter-spacing="1">NEW ON-CHAIN TXS</text>
+   <text id="oc" x="176" y="440" fill="#39ff88" font-size="14" font-weight="700">0</text>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">Why it works</h2>
+  <div class="lines">
+   <div class="ln" id="l1">⚡ <b>Instant and cheap.</b> Payments settle off-chain in moments.</div>
+   <div class="ln" id="l2">🔒 <b>HTLCs.</b> A hash lock means every hop is paid, or nobody is.</div>
+   <div class="ln" id="l3">⛓ <b>Only open and close</b> a channel touch the blockchain.</div>
+   <div class="ln" id="l4">🌐 <b>Liquidity and routing</b> are the hard parts, so nodes route around failures.</div>
+  </div>
+  <div class="big" id="bg">Bitcoin at lightning speed.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#ffe9a0':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+/* ---------- graph ---------- */
+const ND={A:[44,372,'ALICE'],B:[120,316,'BOB'],C:[206,270,'CAROL'],D:[282,82,'DAVE'],E:[118,200,''],F:[204,150,''],G:[46,112,''],H:[282,224,''],I:[40,250,''],J:[200,372,''],K:[282,332,'']};
+const EG=[['A','B',.55],['A','I',.4],['A','J',.6],['B','C',.5],['B','E',.45],['B','J',.55],['I','E',.5],['E','G',.35],['E','F',.6],['C','F',.45],['C','H',.5],['F','D',.4],['F','H',.55],['H','D',.5],['J','K',.45],['K','H',.6],['G','F',.5]];
+const N={},E={},key=(a,b)=>a<b?a+b:b+a;
+for(const id in ND){const [x,y,nm]=ND[id],g=mk('g',{class:'nd'},$('#nodes'));mk('circle',{cx:x,cy:y,r:11,class:'b'},g);mk('text',{x,y:y+3.2,class:'l'},g).textContent=id;
+ if(nm)mk('text',{x,y:y+23,class:'nm'},g).textContent=nm;N[id]={id,x,y,g}}
+EG.forEach(([a,b,f])=>{const A=N[a],B=N[b],g=mk('g',{class:'ed'},$('#edges'));
+ mk('line',{x1:A.x,y1:A.y,x2:B.x,y2:B.y,stroke:'#ff5fd2','stroke-width':3.4,'stroke-linecap':'round',opacity:.6},g);
+ const ov=mk('line',{x1:A.x,y1:A.y,x2:A.x+(B.x-A.x)*f,y2:A.y+(B.y-A.y)*f,stroke:'#29d9ff','stroke-width':3.4,'stroke-linecap':'round'},g);
+ E[key(a,b)]={a,b,f,f0:f,ov,g}});
+function drawE(e){const A=N[e.a],B=N[e.b];e.ov.setAttribute('x2',A.x+(B.x-A.x)*e.f);e.ov.setAttribute('y2',A.y+(B.y-A.y)*e.f)}
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(t0)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+let parts=[];
+function spark(x,y,c,n=10,sp=2.4){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1,e:mk('circle',{r:1.2+Math.random()*2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+function frame(){parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.l-=.03;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+
+/* ---------- bolt along one hop ---------- */
+async function hop(u,v,col,ms,frac=1){const A=N[u],B=N[v],jag=mk('path',{fill:'none',stroke:col,'stroke-width':2.2,'stroke-linejoin':'round'},$('#fx')),
+ head=mk('circle',{r:4.5,fill:'#fff'},$('#fx')),dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy),nx=-dy/L,ny=dx/L;
+ await tween(0,frac,ms,p=>{let d='M'+A.x+' '+A.y;const seg=9;for(let i=1;i<=seg;i++){const q=p*i/seg,o=(i<seg?(Math.random()-.5)*10:0)*Math.sin(Math.PI*i/seg);d+='L'+(A.x+dx*q+nx*o).toFixed(1)+' '+(A.y+dy*q+ny*o).toFixed(1)}
+  jag.setAttribute('d',d);head.setAttribute('cx',A.x+dx*p);head.setAttribute('cy',A.y+dy*p)},eio);
+ jag.remove();head.remove();if(frac===1)spark(B.x,B.y,col,8,2)}
+const locks={},routes=[];
+function addLock(u,v){const A=N[u],B=N[v],t=mk('text',{x:(A.x+B.x)/2,y:(A.y+B.y)/2+4,'font-size':11,'text-anchor':'middle'},$('#locks'));t.textContent='🔒';locks[key(u,v)]=t;
+ routes.push(mk('line',{x1:A.x,y1:A.y,x2:B.x,y2:B.y,stroke:'#ffe14a','stroke-width':6,opacity:.35,'stroke-linecap':'round'},$('#routes')))}
+function clearRoute(){Object.values(locks).forEach(t=>t.remove());for(const k in locks)delete locks[k];routes.splice(0).forEach(r=>r.remove())}
+function setNode(id,cls){const g=N[id].g;g.classList.remove('hot','off','ok');if(cls)g.classList.add(cls)}
+async function shift(u,v,d){const e=E[key(u,v)],to=e.f+(e.a===u?-d:d);await tween(e.f,to,520,x=>{e.f=x;drawE(e)},eio)}
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+function banner(a,b=''){$('#b1').textContent=a;$('#b2').textContent=b}
+const fmt=v=>Math.round(v).toLocaleString('en-US');
+function reset(){clearRoute();for(const id in N){N[id].g.setAttribute('class','nd');}for(const k in E){E[k].g.setAttribute('class','ed');E[k].f=E[k].f0;drawE(E[k])}
+ $('#pc').textContent='0';$('#bg').classList.remove('on');banner('…','')}
+async function montage(){const R=[['I','E','F','H'],['J','K','H'],['G','E','B','J'],['A','I','E','F','D'],['K','H','D'],['B','E','G'],['A','J','K'],['D','F','E','I']];let go=true;
+ const loop=async(off)=>{let i=off;await sleep(off*300);while(go){const r=R[i++%R.length];for(let k=0;k<r.length-1;k++)await hop(r[k],r[k+1],k%2?'#ffe14a':'#29d9ff',170);await sleep(80)}};
+ const a=loop(0),b=loop(3),c=loop(5);
+ await tween(0,10000,4200,v=>$('#pc').textContent=fmt(v),eio);go=false;await Promise.all([a,b,c])}
+
+async function main(){
+ reset();scene('s1');note('The Lightning Network is a web of payment channels. Each one is opened once on-chain, then used off-chain.');await sleep(2800);
+ const ids=Object.keys(N);for(const id of ids){N[id].g.classList.add('on');await sleep(110)}
+ for(const k in E){E[k].g.classList.add('on');await sleep(70)}
+ note('Each channel splits its funds between the two sides. Cyan is one side’s balance, pink is the other.');await sleep(3000);
+ setNode('A','ok');setNode('D','ok');banner('Alice wants to pay Dave 0.001 BTC','No direct channel: the payment must hop via others.');
+ note('Alice wants to pay Dave, but they have no direct channel. The payment must hop through strangers.','warn');await sleep(3200);
+ banner('Dave’s invoice: hash H = 9f3a7c…','Only Dave knows the secret R behind it.');note('Dave sends an invoice containing a hash H. Only he knows the secret R that unlocks it.');
+ spark(N.D.x,N.D.y,'#ffe14a',16,2.6);await sleep(3000);
+ /* attempt 1 via Carol (offline) */
+ banner('Route 1: Alice → Bob → Carol → … → Dave','Locking 0.001 BTC at every hop (HTLC)…');note('Alice tries the shortest route, locking funds hop by hop with a hash lock.','warn');
+ await hop('A','B','#ffe14a',650);addLock('A','B');await hop('B','C','#ffe14a',700,.62);
+ setNode('C','off');spark(N.C.x-8,N.C.y-6,'#ff3b4e',20,3);banner('✘ Carol is offline','The lock expires and the funds return to Alice.');
+ note('Carol is offline. The payment can’t go through, and the locked funds simply return to Alice.','bad');await sleep(2000);
+ clearRoute();spark(N.B.x,N.B.y,'#ff3b4e',8,2);await sleep(1200);
+ /* attempt 2 */
+ banner('Route 2: Alice → Bob → E → F → Dave','Rerouting around the failure…');note('No problem: routing finds another path through the network.','warn');await sleep(1600);
+ const P=['A','B','E','F','D'];
+ for(let i=0;i<P.length-1;i++){await hop(P[i],P[i+1],'#ffe14a',620);addLock(P[i],P[i+1])}
+ setNode('D','hot');banner('Locked all the way to Dave','Each hop is conditional: “pay if you show me R”.');note('Funds are locked across every hop. Each one releases only for the secret R.');await sleep(1800);
+ banner('Dave reveals secret R','R flows backwards and unlocks every hop.');note('Dave reveals the secret R to claim his payment. It travels backwards, unlocking each hop.','good');
+ spark(N.D.x,N.D.y,'#ffd23f',18,3);
+ for(let i=P.length-1;i>0;i--){await hop(P[i],P[i-1],'#ffd23f',560);const t=locks[key(P[i],P[i-1])];if(t)t.remove();shift(P[i-1],P[i],.14)}
+ await sleep(700);setNode('D','ok');setNode('A','ok');$('#pc').textContent='1';
+ banner('✔ Paid: 0.001 BTC from Alice to Dave','Every hop settled or none did. No trust required.');note('Paid, in a fraction of a second, with no on-chain transaction. Balances shifted inside each channel.','good');await sleep(3200);
+ clearRoute();setNode('D','');setNode('A','');banner('Thousands of payments, zero blockchain txs','Only opening and closing channels touch the chain.');note('Now imagine thousands of payments flowing across the network…','warn');
+ await montage();$('#pc').textContent='10,000';note('10,000 payments later: still zero new on-chain transactions.','good');await sleep(2800);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>

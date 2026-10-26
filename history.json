@@ -91,5 +91,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "Rug Pull (1).html",
+    "title": "🧨 Rug Pull Explained: Liquidity Gets Removed",
+    "video": "Rug Pull (1).mp4",
+    "timestamp": "2026-10-26T15:37:51Z",
+    "publish": {
+      "instagram": {
+        "id": "17909105139575044",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1110528081955057",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]

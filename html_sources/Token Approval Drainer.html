@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Token Approval Drainer</title>
+<style>
+:root{--bg:#05030c;--v:#9b6bff;--c:#29d9ff;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#ece8f8;--d:#8f86b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px;transition:filter .5s}
+#stage.rw{filter:hue-rotate(150deg) saturate(1.5) brightness(1.1)}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;left:-90px;top:60px;background:#3a1b9a}
+.b2{width:250px;height:250px;right:-100px;top:320px;background:#7a1b6a;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#0b5a8a;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:34px;line-height:1.05;margin:150px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--o),var(--r));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(255,59,78,.8))}
+.sub{color:#bdb3dc;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #2e2460;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(12,8,30,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--o);background:rgba(60,34,6,.86);color:#ffd9b0}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #2e2460;background:rgba(12,8,30,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+.big{margin-top:20px;font-size:23px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--c),var(--m));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.flow{stroke-dasharray:3 9;animation:fl .9s linear infinite}
+@keyframes fl{to{stroke-dashoffset:-24}}
+.po{transform-box:fill-box;transform-origin:center;animation:po 2.4s ease-in-out infinite}
+@keyframes po{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.18);opacity:.15}}
+.nd rect{fill:#0d0a24;stroke:#4a3c90;stroke-width:1.6;transition:all .3s}
+.nd text{fill:#cfc6f5;font-size:8.5px;text-anchor:middle}
+.nd.hot rect{stroke:#ff9d3d;filter:drop-shadow(0 0 8px #ff9d3d)}
+.nd.bad rect{stroke:#ff3b4e;fill:#2a0a12;filter:drop-shadow(0 0 10px #ff3b4e)}
+.nd.dead rect{stroke:#3a3a50;fill:#101018}.nd.dead text{fill:#6a6a80}
+.bg{opacity:0;transition:opacity .4s}.bg.on{opacity:1}
+#stamp{opacity:0;transition:opacity .4s}#stamp.on{opacity:1}
+#ban{opacity:0;transition:opacity .4s}#ban.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>One click.<br>Unlimited access.<br><em>Forever.</em></h1>
+  <div class="sub">Token approvals: the invisible permission that can drain your wallet.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>The approval trap</h2>
+  <svg viewBox="0 0 324 440" width="324" height="440">
+   <defs>
+    <radialGradient id="og" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#cdb8ff"/><stop offset=".5" stop-color="#7a4bff"/><stop offset="1" stop-color="#2a1a7a"/></radialGradient>
+    <filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   </defs>
+   <g id="orbits"></g>
+   <g id="beams"></g>
+   <circle class="po" cx="162" cy="205" r="44" fill="none" stroke="#9b6bff" stroke-width="2"/>
+   <circle id="orb" cx="162" cy="205" r="33" fill="url(#og)" filter="url(#gw)"/>
+   <text id="bal" x="162" y="207" fill="#fff" font-size="14" font-weight="700" text-anchor="middle" style="paint-order:stroke;stroke:#1a0f50;stroke-width:3px">$4,200</text>
+   <text x="162" y="220" fill="#d9c8ff" font-size="6.5" text-anchor="middle" letter-spacing="1.2">YOUR WALLET</text>
+   <g id="nodes"></g>
+   <g id="toks"></g>
+   <g id="parts"></g>
+   <text x="62" y="412" font-size="24" text-anchor="middle">🕵</text>
+   <text x="62" y="430" fill="#ff3b4e" font-size="8" text-anchor="middle" letter-spacing="1">ATTACKER</text>
+   <text id="ban" x="162" y="40" fill="#ffd23f" font-size="11" font-weight="700" text-anchor="middle" style="paint-order:stroke;stroke:#05030c;stroke-width:3px">⏳ 3 WEEKS LATER…</text>
+   <text id="rwt" x="162" y="205" fill="#29d9ff" font-size="22" font-weight="900" text-anchor="middle" opacity="0" style="paint-order:stroke;stroke:#05030c;stroke-width:4px;letter-spacing:.08em">⏪ REWIND</text>
+   <text id="rvt" x="112" y="296" fill="#39ff88" font-size="9" font-weight="700" text-anchor="middle" opacity="0" style="paint-order:stroke;stroke:#05030c;stroke-width:3px">transferFrom() → ✘ reverted</text>
+   <g id="stamp"><text x="162" y="312" fill="#ff3b4e" font-size="30" font-weight="900" text-anchor="middle" transform="rotate(-8 162 305)" style="paint-order:stroke;stroke:#05030c;stroke-width:5px;letter-spacing:.05em">DRAINED</text></g>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">Stay safe</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🔎 <b>Review approvals</b> regularly and revoke the ones you don’t use.</div>
+   <div class="ln" id="l2">🎯 <b>Approve exact amounts</b> instead of unlimited.</div>
+   <div class="ln" id="l3">✍ <b>Read what you sign.</b> “Free claim” can mean “approve all”.</div>
+   <div class="ln" id="l4">🧊 <b>Use a separate wallet</b> for risky sites and new airdrops.</div>
+  </div>
+  <div class="big" id="bg">Permission is power.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#c9a8ff':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+const OX=162,OY=205;
+/* orbits + tokens */
+[56,76,96].forEach(r=>mk('circle',{cx:OX,cy:OY,r,fill:'none',stroke:'#2e2460','stroke-width':1,'stroke-dasharray':'2 5'},$('#orbits')));
+const TT=[{r:56,sp:.55,sym:'Ξ',col:'#627eea',v:500},{r:76,sp:-.4,sym:'$',col:'#2775ca',v:600},{r:96,sp:.3,sym:'▣',col:'#ff5fd2',v:300}];
+const toks=[];TT.forEach(o=>{for(let k=0;k<3;k++){const g=mk('g',{},$('#toks'));mk('circle',{r:9,fill:o.col,filter:'url(#gw)'},g);mk('text',{y:3.5,fill:'#fff','font-size':10,'font-weight':700,'text-anchor':'middle'},g).textContent=o.sym;
+ toks.push({...o,ph:k*2.0944+o.r*.05,g,st:'orbit',x:OX,y:OY})}});
+const T0=performance.now();
+function posOf(tk,t){const a=tk.ph+tk.sp*t;return{x:OX+tk.r*Math.cos(a),y:OY+tk.r*Math.sin(a)}}
+let parts=[];
+function spark(x,y,c,n=10,sp=2.2){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1,e:mk('circle',{r:1.2+Math.random()*2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+function frame(now){const t=(now-T0)/1000;
+ toks.forEach(tk=>{if(tk.st==='orbit'){const p=posOf(tk,t);tk.x=p.x;tk.y=p.y;tk.g.setAttribute('transform',`translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);tk.g.setAttribute('opacity',1)}});
+ parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.l-=.03;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+
+/* nodes + beams */
+const ND=[{k:'dex',x:62,y:70,l:'DEX',tag:'∞',col:'#29d9ff'},{k:'mkt',x:262,y:70,l:'NFT MARKET',tag:'5 USDC',col:'#39ff88'},{k:'air',x:62,y:340,l:'FREE AIRDROP ✨',tag:'∞',col:'#29d9ff'},{k:'lend',x:262,y:340,l:'LENDING',tag:'∞',col:'#29d9ff'}];
+ND.forEach(n=>{
+ n.base=mk('line',{x1:OX,y1:OY,x2:OX,y2:OY,stroke:n.col,'stroke-width':5,opacity:0,filter:'url(#gw)','stroke-linecap':'round'},$('#beams'));
+ n.flow=mk('line',{x1:OX,y1:OY,x2:OX,y2:OY,stroke:'#fff','stroke-width':1.8,opacity:0,class:'flow'},$('#beams'));
+ n.bd=mk('g',{class:'bg',transform:`translate(${(OX+n.x)/2} ${(OY+n.y)/2})`},$('#beams'));
+ n.bc=mk('rect',{x:n.tag.length>1?-24:-11,y:-10,width:n.tag.length>1?48:22,height:20,rx:10,fill:'#0d0a24',stroke:n.tag==='∞'?'#ff9d3d':'#39ff88','stroke-width':1.6},n.bd);
+ n.bt=mk('text',{y:4,fill:n.tag==='∞'?'#ff9d3d':'#39ff88','font-size':n.tag==='∞'?14:9,'font-weight':700,'text-anchor':'middle'},n.bd);n.bt.textContent=n.tag;
+ n.g=mk('g',{class:'nd'},$('#nodes'));mk('rect',{x:n.x-42,y:n.y-17,width:84,height:34,rx:10},n.g);mk('text',{x:n.x,y:n.y+3},n.g).textContent=n.l;
+ n.up=false});
+const ID={dex:0,mkt:1,air:2,lend:3};
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(t0)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+function setEnd(n,p){const x=OX+(n.x-OX)*p,y=OY+(n.y-OY)*p;[n.base,n.flow].forEach(l=>{l.setAttribute('x2',x);l.setAttribute('y2',y)})}
+async function form(k){const n=ND[ID[k]];n.g.classList.add('hot');n.base.setAttribute('opacity',.35);n.flow.setAttribute('opacity',.9);
+ await tween(0,1,650,p=>setEnd(n,p),eio);n.bd.classList.add('on');n.up=true;await sleep(300);n.g.classList.remove('hot')}
+function hideBeam(n){n.base.setAttribute('opacity',0);n.flow.setAttribute('opacity',0);n.bd.classList.remove('on');setEnd(n,0);n.g.setAttribute('class','nd');n.up=false;
+ n.base.setAttribute('stroke',n.col);n.base.setAttribute('stroke-width',5);n.bc.setAttribute('stroke',n.tag==='∞'?'#ff9d3d':'#39ff88');n.bt.textContent=n.tag;n.bt.setAttribute('fill',n.tag==='∞'?'#ff9d3d':'#39ff88');n.bt.setAttribute('font-size',n.tag==='∞'?14:9)}
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+const fmt=v=>'$'+Math.round(v).toLocaleString('en-US');
+let bal=4200;function setBal(v){bal=v;$('#bal').textContent=fmt(v)}
+function flyTo(tk,tgt,ms,trail){return tween(0,1,ms,p=>{const t=(performance.now()-T0)/1000,a=tk.sx,b=typeof tgt==='function'?tgt(t):tgt;
+ tk.x=a.x+(b.x-a.x)*p;tk.y=a.y+(b.y-a.y)*p;tk.g.setAttribute('transform',`translate(${tk.x.toFixed(1)} ${tk.y.toFixed(1)})`);if(trail&&Math.random()<.7)spark(tk.x,tk.y,'#ff3b4e',1,.6)},eio)}
+async function drainOne(tk){tk.st='fly';tk.sx={x:tk.x,y:tk.y};
+ await flyTo(tk,{x:62,y:340},520,true);spark(62,340,'#ff3b4e',8,2);tk.sx={x:62,y:340};
+ await flyTo(tk,{x:62,y:408},300,true);spark(62,408,'#ff3b4e',10,2.4);tk.g.setAttribute('opacity',0);tk.st='gone';setBal(bal-tk.v)}
+async function restoreOne(tk){tk.st='fly';tk.g.setAttribute('opacity',1);tk.sx={x:62,y:408};
+ await flyTo(tk,t=>posOf(tk,t),650,false);tk.st='orbit';setBal(bal+tk.v)}
+function reset(){toks.forEach(tk=>{tk.st='orbit';tk.g.setAttribute('opacity',1)});ND.forEach(hideBeam);setBal(4200);
+ $('#stamp').classList.remove('on');$('#ban').classList.remove('on');$('#rwt').setAttribute('opacity',0);$('#rvt').setAttribute('opacity',0);$('#bg').classList.remove('on');stage.classList.remove('rw')}
+
+async function main(){
+ reset();scene('s1');note('Your wallet holds tokens: ETH, stablecoins, NFTs. They orbit under your control.');await sleep(3000);
+ note('To trade or lend, you give a contract permission to move your tokens. That permission is an approval.');await form('dex');await sleep(1700);
+ note('Many apps request an UNLIMITED allowance (∞) so you never have to click again.','warn');await form('lend');await sleep(1900);
+ note('Safer: approve only what you need. This one allows just 5 USDC.','good');await form('mkt');await sleep(2300);
+ note('Then a “free airdrop” site asks you to sign a transaction…','warn');ND[2].g.classList.add('hot');await sleep(1700);
+ await form('air');note('…and you just granted the attacker’s contract an unlimited approval. Nothing visibly happens.','bad');await sleep(2800);
+ $('#ban').classList.add('on');note('Weeks later you’ve forgotten about it. The permission is still active.');await sleep(2600);$('#ban').classList.remove('on');
+ const n=ND[2];n.g.classList.remove('hot');n.g.classList.add('bad');n.base.setAttribute('stroke','#ff3b4e');n.base.setAttribute('stroke-width',9);n.base.setAttribute('opacity',.7);n.bc.setAttribute('stroke','#ff3b4e');n.bt.setAttribute('fill','#ff3b4e');
+ stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),950);
+ note('No new signature needed. The approved contract calls transferFrom and sweeps everything.','bad');
+ const order=[...toks].sort(()=>Math.random()-.5);
+ await Promise.all(order.map((tk,i)=>sleep(i*300).then(()=>drainOne(tk))));
+ $('#stamp').classList.add('on');await sleep(2800);
+ $('#stamp').classList.remove('on');stage.classList.add('rw');$('#rwt').setAttribute('opacity',1);
+ note('Rewind. Same story, but this time the user revokes the unused approval.','good');await sleep(1200);
+ $('#rwt').setAttribute('opacity',0);
+ await Promise.all([...toks].map((tk,i)=>sleep(i*160).then(()=>restoreOne(tk))));
+ stage.classList.remove('rw');n.g.setAttribute('class','nd hot');n.base.setAttribute('stroke','#29d9ff');n.base.setAttribute('stroke-width',5);n.bc.setAttribute('stroke','#ff9d3d');n.bt.setAttribute('fill','#ff9d3d');setBal(4200);await sleep(1200);
+ /* revoke slash */
+ const mx=(OX+62)/2,my=(OY+340)/2,dx=-100,dy=135,L=Math.hypot(dx,dy),px=dy/L,py=-dx/L;
+ const sl=mk('line',{x1:mx-px*46,y1:my-py*46,x2:mx-px*46,y2:my-py*46,stroke:'#fff','stroke-width':3,filter:'url(#gw)','stroke-linecap':'round'},$('#parts'));
+ await tween(0,1,220,p=>{sl.setAttribute('x2',mx-px*46+px*92*p);sl.setAttribute('y2',my-py*46+py*92*p)});
+ spark(mx,my,'#39ff88',26,3.2);spark(mx,my,'#fff',12,2);sl.remove();
+ n.bd.classList.remove('on');await tween(1,.45,420,p=>setEnd(n,p),eio);n.base.setAttribute('opacity',0);n.flow.setAttribute('opacity',0);n.g.setAttribute('class','nd dead');n.up=false;
+ note('REVOKED. The contract no longer has any permission over your tokens.','good');await sleep(2200);
+ const att=mk('circle',{r:5,fill:'#ff3b4e',filter:'url(#gw)',cx:62,cy:340},$('#parts'));
+ await tween(0,1,700,p=>{att.setAttribute('cx',62+(mx-62)*p);att.setAttribute('cy',340+(my-340)*p)},eio);
+ spark(mx,my,'#ff3b4e',14,2.4);att.remove();$('#rvt').setAttribute('opacity',1);
+ note('The attacker’s call fails and your tokens stay put.','good');await sleep(3200);$('#rvt').setAttribute('opacity',0);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>
