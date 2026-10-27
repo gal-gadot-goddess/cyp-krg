@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Ethereum Account Abstraction (ERC-4337) Smart Wallets · Gas Sponsorship, Batching and Social Recovery (Circuit Rail Explainer Reel)</title>
+<style>
+:root{--bg:#04030c;--c:#29d9ff;--v:#9b6bff;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#ece8f8;--d:#8f86b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;left:-90px;top:60px;background:#3a1b9a}
+.b2{width:250px;height:250px;right:-100px;top:330px;background:#0b6a8a;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#8a1b6a;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:33px;line-height:1.06;margin:150px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--c),var(--m));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(155,107,255,.8))}
+.sub{color:#bdb3dc;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #2e2460;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(12,8,30,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,46,6,.86);color:#ffe9a8}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #2e2460;background:rgba(12,8,30,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+.big{margin-top:20px;font-size:23px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--c),var(--m));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.fd{opacity:0;transition:opacity .45s}.fd.on{opacity:1}
+.rail{stroke-dasharray:3 8;animation:fl 1.1s linear infinite}
+@keyframes fl{to{stroke-dashoffset:-22}}
+.stn rect{fill:#0c0a26;stroke:#3a3070;stroke-width:1.5;transition:stroke .3s,fill .3s}
+.stn text{fill:#cfc6f5;text-anchor:middle}
+.stn.hot rect{stroke:#ffd23f;fill:#2a2208;filter:drop-shadow(0 0 8px #ffd23f)}
+.stn.ok rect{stroke:#39ff88;fill:#07301a;filter:drop-shadow(0 0 8px #39ff88)}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>Your wallet,<br>but <em>programmable.</em></h1>
+  <div class="sub">Account abstraction (ERC-4337): smart wallets with sponsored gas, batched actions and social recovery.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>Account abstraction</h2>
+  <svg viewBox="0 0 324 440" width="324" height="440">
+   <defs><filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+   <!-- rail view -->
+   <g id="railv">
+    <path d="M30 215H294" stroke="#3a3070" stroke-width="3" fill="none" opacity=".6"/>
+    <path d="M30 215H294" stroke="#9b6bff" stroke-width="1.6" fill="none" class="rail"/>
+    <path d="M162 137V198" stroke="#3a3070" stroke-width="2" fill="none" stroke-dasharray="3 5"/>
+    <g id="stns"></g>
+    <path id="scan" d="M162 190V240" stroke="#29d9ff" stroke-width="2" opacity="0" filter="url(#gw)"/>
+   </g>
+   <!-- recovery view -->
+   <g id="recv" class="fd">
+    <g id="gds"></g>
+    <circle id="rc" cx="162" cy="205" r="30" fill="#14102e" stroke="#29d9ff" stroke-width="2.5" filter="url(#gw)"/>
+    <text id="rk" x="162" y="214" font-size="26" text-anchor="middle">🔑</text>
+    <text x="162" y="251" fill="#8f86b0" font-size="7" text-anchor="middle" letter-spacing="1">SMART ACCOUNT</text>
+    <text id="rp" x="162" y="141" fill="#ffd23f" font-size="9" font-weight="700" text-anchor="middle">APPROVALS 0/5</text>
+   </g>
+   <g id="pk"></g>
+   <g id="parts"></g>
+   <text id="fl" class="fd" x="30" y="170" fill="#ff9d3d" font-size="9" font-weight="700" text-anchor="middle"></text>
+   <rect x="6" y="318" width="152" height="62" rx="12" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text x="16" y="333" fill="#8f86b0" font-size="7" letter-spacing="1">TRANSACTIONS · GAS YOU PAY</text>
+   <text id="tx" x="16" y="360" fill="#29d9ff" font-size="22" font-weight="700">0</text>
+   <text id="gs" x="150" y="360" fill="#ff9d3d" font-size="22" font-weight="700" text-anchor="end">$0</text>
+   <rect x="166" y="318" width="152" height="62" rx="12" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text x="176" y="333" fill="#8f86b0" font-size="7" letter-spacing="1">ACCOUNT TYPE</text>
+   <text id="ac" x="176" y="358" fill="#ffd23f" font-size="12" font-weight="700">EOA · 1 key</text>
+   <text id="ad" x="176" y="372" fill="#8f86b0" font-size="7.5">one key, one point of failure</text>
+   <text id="stx" x="162" y="404" fill="#39ff88" font-size="10" font-weight="700" text-anchor="middle"></text>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">What you gain</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🧩 <b>Wallets as smart contracts.</b> Your rules, not just one key.</div>
+   <div class="ln" id="l2">⛽ <b>Sponsored gas.</b> A paymaster can pay fees for you.</div>
+   <div class="ln" id="l3">📦 <b>Batching.</b> Many actions, one signature, one transaction.</div>
+   <div class="ln" id="l4">🛟 <b>Recovery.</b> Trusted guardians can restore access without a seed phrase.</div>
+  </div>
+  <div class="big" id="bg">Wallets, upgraded.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#d9b8ff':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+/* ---- stations ---- */
+const ST={user:[30,215,'YOU','EOA wallet'],bund:[96,215,'BUNDLER','packs ops'],entry:[162,215,'ENTRYPOINT','validates'],acct:[228,215,'ACCOUNT','smart contract'],dex:[294,215,'DEX','target'],pay:[162,120,'PAYMASTER','pays gas']},SG={};
+for(const k in ST){const [x,y,a,b]=ST[k],g=mk('g',{class:'stn'},$('#stns'));mk('rect',{x:x-28,y:y-17,width:56,height:34,rx:9},g);mk('text',{x,y:y-2,'font-size':7.5,'font-weight':700},g).textContent=a;
+ const t2=mk('text',{x,y:y+10,'font-size':6.5},g);t2.textContent=b;t2.style.fill='#8f86b0';SG[k]=g}
+/* ---- guardians ---- */
+const GD=[];for(let i=0;i<5;i++){const a=-Math.PI/2+i*2*Math.PI/5,x=162+86*Math.cos(a),y=205+86*Math.sin(a),g=mk('g',{},$('#gds'));
+ const c=mk('circle',{cx:x,cy:y,r:14,fill:'#14102e',stroke:'#4a4a8a','stroke-width':1.8},g);const e=mk('text',{x,y:y+5,'font-size':14,'text-anchor':'middle'},g);e.textContent=['👩','🧑','👨','👵','🧔'][i];
+ mk('text',{x,y:y+27,fill:'#8f86b0','font-size':6.5,'text-anchor':'middle'},g).textContent='GUARDIAN '+(i+1);GD.push({x,y,c})}
+
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const s=performance.now();(function f(t){const p=Math.min(1,(t-s)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(s)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+let parts=[];
+function spark(x,y,c,n=10,sp=2.4,g=.03){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g,l:1,dc:.028,e:mk('circle',{r:1.2+Math.random()*2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+function frame(){parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.l-=p.dc;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function pkt(label,col,w=34){const g=mk('g',{opacity:0},$('#pk'));mk('rect',{x:-w/2,y:-8,width:w,height:16,rx:8,fill:col,filter:'url(#gw)'},g);const t=mk('text',{y:3,fill:'#04030c','font-size':7,'font-weight':700,'text-anchor':'middle'},g);t.textContent=label;
+ const o={g,x:0,y:0,set(x,y,op){o.x=x;o.y=y;g.setAttribute('transform',`translate(${x} ${y})`);if(op!==undefined)g.setAttribute('opacity',op)},rm(){g.remove()}};return o}
+function move(p,x1,y1,ms,arc=0){const x0=p.x,y0=p.y,mx=(x0+x1)/2,my=(y0+y1)/2+arc;return tween(0,1,ms,t=>{const q=1-t;p.set(q*q*x0+2*q*t*mx+t*t*x1,q*q*y0+2*q*t*my+t*t*y1)},eio)}
+const fade=(p,o)=>p.g.setAttribute('opacity',o);
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+const lit=(k,c)=>{const g=SG[k];g.classList.remove('hot','ok');if(c)g.classList.add(c)};
+function setP(tx,gas){$('#tx').textContent=tx;$('#gs').textContent='$'+gas}
+function acct(a,b,c){$('#ac').textContent=a;$('#ad').textContent=b;$('#ac').setAttribute('fill',c||'#ffd23f')}
+function status(t,c){$('#stx').textContent=t;$('#stx').setAttribute('fill',c||'#39ff88')}
+function floatTxt(x,y,t,col){const e=$('#fl');e.textContent=t;e.setAttribute('x',x);e.setAttribute('y',y);e.setAttribute('fill',col||'#ff9d3d');e.classList.add('on');setTimeout(()=>e.classList.remove('on'),900)}
+function reset(){for(const k in SG)lit(k,'');$('#recv').classList.remove('on');$('#railv').setAttribute('opacity',1);$('#pk').innerHTML='';setP(0,0);acct('EOA · 1 key','one key, one point of failure');status('');
+ GD.forEach(g=>{g.c.setAttribute('stroke','#4a4a8a');g.c.setAttribute('fill','#14102e')});$('#rk').textContent='🔑';$('#rc').setAttribute('stroke','#29d9ff');$('#rp').textContent='APPROVALS 0/5';$('#bg').classList.remove('on');
+ SG.acct.setAttribute('opacity',.25);SG.bund.setAttribute('opacity',.25);SG.entry.setAttribute('opacity',.25);SG.pay.setAttribute('opacity',0);SG.dex.setAttribute('opacity',1);SG.user.setAttribute('opacity',1)}
+async function main(){
+ reset();scene('s1');
+ /* --- A: classic wallet --- */
+ note('A classic wallet (EOA) is just one private key. Every action is its own transaction, and you pay the gas yourself.');await sleep(3200);
+ const L=[['approve','#29d9ff'],['swap','#9b6bff'],['stake','#ff5fd2']];let tx=0,gas=0;
+ for(const [lb,col] of L){const p=pkt(lb,col);p.set(30,215,1);spark(30,215,'#ff9d3d',8,1.8);floatTxt(30,175,'−$3 gas');tx++;gas+=3;setP(tx,gas);await move(p,294,215,900);spark(294,215,col,10);p.rm();await sleep(240)}
+ note('Three actions, three transactions, $9 of gas, and you must hold ETH just to pay fees.','warn');await sleep(2600);
+ /* --- B: smart account --- */
+ SG.acct.setAttribute('opacity',1);SG.bund.setAttribute('opacity',1);SG.entry.setAttribute('opacity',1);SG.pay.setAttribute('opacity',1);
+ setP(0,0);acct('Smart account','a contract with its own rules','#39ff88');
+ note('With account abstraction (ERC-4337), your wallet is a smart contract. You sign one UserOperation describing everything you want.','good');await sleep(2800);
+ const a=pkt('approve','#29d9ff',30),b=pkt('swap','#9b6bff',30),c=pkt('stake','#ff5fd2',30);a.set(30,185,1);b.set(30,215,1);c.set(30,245,1);await sleep(500);
+ await Promise.all([move(a,30,215,500),move(c,30,215,500)]);a.rm();b.rm();c.rm();
+ const op=pkt('UserOp','#ffd23f',46);op.set(30,215,1);spark(30,215,'#ffd23f',16,2.4);lit('user','hot');await sleep(1400);
+ note('A bundler collects UserOperations from many users into one bundle.','warn');
+ await move(op,96,215,800);lit('bund','hot');
+ const o1=pkt('op','#2fe0d0',26),o2=pkt('op','#2fe0d0',26);o1.set(96,262,1);o2.set(96,170,1);await Promise.all([move(o1,106,230,500),move(o2,106,200,500)]);await sleep(900);
+ note('The bundle goes to the EntryPoint contract, which validates each operation.','warn');
+ await Promise.all([move(op,162,215,800),move(o1,172,230,800),move(o2,172,200,800)]);lit('bund','');lit('user','');lit('entry','hot');
+ const sc=$('#scan');sc.setAttribute('opacity',1);await tween(0,1,700,t=>sc.setAttribute('transform',`translate(${-28+56*t} 0)`));sc.setAttribute('opacity',0);await sleep(400);
+ note('A paymaster can sponsor the gas, so you don’t need any ETH. Your cost: $0.','good');lit('pay','ok');
+ for(let k=0;k<4;k++){const g=mk('circle',{r:3.4,fill:'#ffd23f',filter:'url(#gw)',cx:162,cy:137},$('#parts'));tween(0,1,500,t=>g.setAttribute('cy',137+60*t),eio).then(()=>{g.remove();spark(162,197,'#ffd23f',5,1.4)});await sleep(160)}
+ floatTxt(162,172,'gas sponsored','#39ff88');await sleep(1800);lit('pay','');
+ note('The smart account checks your signature, then runs your whole batch.','warn');
+ await Promise.all([move(op,228,215,800),move(o1,238,230,800),move(o2,238,200,800)]);lit('entry','');lit('acct','hot');
+ const kk=mk('text',{x:228,y:196,'font-size':16,'text-anchor':'middle'},$('#parts'));kk.textContent='🔑';spark(228,215,'#39ff88',14,2.2);await sleep(900);kk.remove();lit('acct','ok');
+ fade(o1,0);fade(o2,0);await sleep(300);
+ /* batch executes */
+ const calls=[['approve','#29d9ff',185],['swap','#9b6bff',215],['stake','#ff5fd2',245]];op.rm();
+ const ps=calls.map(([lb,col,y])=>{const p=pkt(lb,col,30);p.set(228,215,1);return p});
+ await Promise.all(ps.map((p,i)=>sleep(i*160).then(()=>move(p,294,calls[i][2]*.4+215*.6,700))));
+ spark(294,215,'#39ff88',22,3);lit('dex','ok');ps.forEach(p=>p.rm());setP(1,0);
+ status('✔ 3 actions · 1 transaction · $0 gas for you','#39ff88');
+ note('Three actions executed in one transaction. You paid $0 in gas.','good');await sleep(3800);status('');o1.rm();o2.rm();
+ /* --- C: recovery --- */
+ lit('dex','');lit('acct','');$('#railv').setAttribute('opacity',0);$('#recv').classList.add('on');acct('Smart account','with guardians','#39ff88');
+ note('Another superpower: recovery. Say you lose your key…','warn');await sleep(2200);
+ stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),700);$('#rk').textContent='💥';$('#rc').setAttribute('stroke','#ff3b4e');spark(162,205,'#ff3b4e',30,3.4);status('✘ key lost','#ff3b4e');await sleep(1600);
+ note('A smart account can name trusted guardians. If enough of them approve, the wallet gets a new key, with no seed phrase needed.','good');await sleep(2800);
+ let ap=0;for(const i of[0,2,4]){const g=GD[i];g.c.setAttribute('stroke','#39ff88');g.c.setAttribute('fill','#07301a');
+  const ball=mk('circle',{r:3.6,fill:'#39ff88',filter:'url(#gw)',cx:g.x,cy:g.y},$('#parts'));await tween(0,1,600,t=>{ball.setAttribute('cx',g.x+(162-g.x)*t);ball.setAttribute('cy',g.y+(205-g.y)*t)},eio);ball.remove();spark(162,205,'#39ff88',10,1.8);ap++;$('#rp').textContent='APPROVALS '+ap+'/5';await sleep(300)}
+ await sleep(400);$('#rk').textContent='🗝';$('#rc').setAttribute('stroke','#39ff88');spark(162,205,'#39ff88',34,3.4);status('✔ recovered: new key, funds untouched','#39ff88');acct('Recovered','3 of 5 guardians approved','#39ff88');
+ note('Three of five guardians approved, so a new key takes over. Your funds never moved.','good');await sleep(3800);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>

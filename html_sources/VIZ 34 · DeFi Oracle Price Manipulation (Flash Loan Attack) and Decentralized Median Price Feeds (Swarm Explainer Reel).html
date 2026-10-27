@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>DeFi Oracle Price Manipulation and Decentralized Median Price Feeds (Swarm Explainer Reel)</title>
+<style>
+:root{--bg:#04030c;--c:#29d9ff;--v:#9b6bff;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#ece8f8;--d:#8f86b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px;transition:filter .5s}
+#stage.rw{filter:hue-rotate(150deg) saturate(1.5) brightness(1.1)}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;left:-90px;top:60px;background:#3a1b9a}
+.b2{width:250px;height:250px;right:-100px;top:330px;background:#0b6a8a;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#8a1b6a;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:30px;line-height:1.07;margin:140px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--c),var(--m));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(155,107,255,.8))}
+.sub{color:#bdb3dc;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #2e2460;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(12,8,30,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,46,6,.86);color:#ffe9a8}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #2e2460;background:rgba(12,8,30,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+.big{margin-top:20px;font-size:23px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--c),var(--m));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.fd{opacity:0;transition:opacity .4s}.fd.on{opacity:1}
+.bandf{animation:bf 2.4s linear infinite}
+@keyframes bf{to{stroke-dashoffset:-40}}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>Your contract<br>can’t see prices.<br><em>Oracles can.</em></h1>
+  <div class="sub">How oracle manipulation drains lending protocols, and how decentralized price feeds stop it.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>The oracle problem</h2>
+  <svg viewBox="0 0 324 430" width="324" height="430">
+   <defs>
+    <linearGradient id="mg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#29d9ff" stop-opacity="0"/><stop offset=".25" stop-color="#29d9ff"/><stop offset=".5" stop-color="#ff5fd2"/><stop offset=".75" stop-color="#29d9ff"/><stop offset="1" stop-color="#29d9ff" stop-opacity="0"/></linearGradient>
+    <radialGradient id="og" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#29d9ff"/><stop offset="1" stop-color="#1a3a8a"/></radialGradient>
+    <radialGradient id="rg" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ffd0c0"/><stop offset=".45" stop-color="#ff3b4e"/><stop offset="1" stop-color="#5a0a1a"/></radialGradient>
+    <filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   </defs>
+   <g id="grid" fill="#5a4a78" font-size="7"></g>
+   <g id="stems"></g>
+   <rect id="band" x="14" y="217" width="296" height="3" fill="url(#mg)" filter="url(#gw)" opacity="0"/>
+   <text id="bl" class="fd" x="310" y="210" fill="#ff8ae0" font-size="8" font-weight="700" text-anchor="end">MEDIAN $2,000</text>
+   <g id="orbs"></g>
+   <text id="dl" class="fd" x="162" y="276" fill="#ff9d3d" font-size="8" text-anchor="middle" letter-spacing=".8">DEX POOL SPOT PRICE</text>
+   <text id="fl" class="fd" x="0" y="0" fill="#ffd23f" font-size="8.5" font-weight="700" text-anchor="middle">⚡ FLASH LOAN</text>
+   <text id="ag" class="fd" x="296" y="40" font-size="22" text-anchor="middle">🕵</text>
+   <g id="parts"></g>
+   <rect x="6" y="288" width="152" height="50" rx="10" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text x="16" y="302" fill="#8f86b0" font-size="7" letter-spacing="1">PRICE THE PROTOCOL USES</text><text id="pu" x="16" y="326" fill="#29d9ff" font-size="19" font-weight="700">$2,000</text>
+   <rect x="166" y="288" width="152" height="50" rx="10" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text x="176" y="302" fill="#8f86b0" font-size="7" letter-spacing="1">BORROW LIMIT (75% LTV)</text><text id="bl2" x="176" y="326" fill="#ffd23f" font-size="19" font-weight="700">$15,000</text>
+   <rect x="6" y="346" width="152" height="50" rx="10" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text x="16" y="360" fill="#8f86b0" font-size="7" letter-spacing="1">ATTACKER BORROWED</text><text id="bo" x="16" y="384" fill="#ff8a97" font-size="19" font-weight="700">$0</text>
+   <rect x="166" y="346" width="152" height="50" rx="10" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text x="176" y="360" fill="#8f86b0" font-size="7" letter-spacing="1">PROTOCOL BAD DEBT</text><text id="bd" x="176" y="384" fill="#39ff88" font-size="19" font-weight="700">$0</text>
+   <text id="stx" x="162" y="418" fill="#39ff88" font-size="10" font-weight="700" text-anchor="middle"></text>
+   <g id="stamp" class="fd"><text id="stt" x="162" y="170" fill="#ff3b4e" font-size="26" font-weight="900" text-anchor="middle" transform="rotate(-7 162 162)" style="paint-order:stroke;stroke:#04030c;stroke-width:5px">BAD DEBT</text></g>
+   <text id="rwt" x="162" y="170" fill="#29d9ff" font-size="22" font-weight="900" text-anchor="middle" opacity="0" style="paint-order:stroke;stroke:#04030c;stroke-width:4px;letter-spacing:.08em">⏪ REWIND</text>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">Lessons</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🔭 <b>Contracts need oracles</b> to learn anything outside the chain.</div>
+   <div class="ln" id="l2">⚠ <b>One spot price is fragile.</b> A flash loan can bend a single pool.</div>
+   <div class="ln" id="l3">🧮 <b>Medians of many sources</b> shrug off outliers.</div>
+   <div class="ln" id="l4">⏳ <b>Add TWAPs and deviation checks,</b> and make attacks cost a fortune.</div>
+  </div>
+  <div class="big" id="bg">Don’t trust one price.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#d9b8ff':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+const Y=p=>250-(p-1600)/2200*180,TRUE=2000,DEX=4,fm=v=>'$'+Math.round(v).toLocaleString('en-US');
+[2000,2500,3000,3500].forEach(v=>{mk('line',{x1:30,y1:Y(v),x2:310,y2:Y(v),stroke:'#1c1438','stroke-width':1},$('#grid'));mk('text',{x:4,y:Y(v)+2.5},$('#grid')).textContent='$'+(v/1000).toFixed(1)+'k'});
+const S=[];for(let i=0;i<9;i++){const x=40+i*30.5,st=mk('line',{x1:x,y1:Y(TRUE),x2:x,y2:Y(TRUE),stroke:'#29d9ff','stroke-width':1.4,opacity:0},$('#stems')),
+ g=mk('g',{opacity:0},$('#orbs')),h=mk('circle',{cx:x,cy:Y(TRUE),r:11,fill:'#29d9ff',opacity:.25},g),c=mk('circle',{cx:x,cy:Y(TRUE),r:6.5,fill:'url(#og)',filter:'url(#gw)'},g);
+ S.push({i,x,p:TRUE,t:TRUE,vis:false,man:false,out:false,st,g,h,c})}
+let mode='single',med=TRUE,bandY=Y(TRUE),pu=TRUE,parts=[],last=performance.now(),tt=0;
+let borrowed=0,bad=0;
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;
+ const vs=S.filter(s=>s.vis);
+ for(const s of S){if(!s.vis)continue;s.p+=(s.t-s.p)*.1}
+ const ps=vs.map(s=>s.p).sort((a,b)=>a-b);med=ps.length?ps[Math.floor((ps.length-1)/2)]:TRUE;bandY+=(Y(med)-bandY)*.2;
+ $('#band').setAttribute('y',bandY-1.5);$('#bl').setAttribute('y',bandY-8);$('#bl').textContent='MEDIAN '+fm(med);
+ for(const s of S){const y=Y(s.p);s.out=s.vis&&vs.length>1&&Math.abs(s.p-med)>180;
+  s.st.setAttribute('y1',y);s.st.setAttribute('y2',bandY);s.st.setAttribute('x1',s.x);s.st.setAttribute('x2',s.x);s.st.setAttribute('stroke',s.out?'#ff3b4e':'#29d9ff');s.st.setAttribute('opacity',s.vis?(s.out?.8:.35):0);
+  s.g.setAttribute('opacity',s.vis?1:0);s.c.setAttribute('cy',y);s.h.setAttribute('cy',y);s.c.setAttribute('fill',s.out?'url(#rg)':'url(#og)');s.h.setAttribute('fill',s.out?'#ff3b4e':'#29d9ff');s.h.setAttribute('r',s.out?15+Math.sin(tt*14)*2:11);
+  if(s.out&&Math.random()<.5)spark(s.x+(Math.random()-.5)*10,y,'#ff3b4e',1,1.2)}
+ const dx=S[DEX];$('#dl').setAttribute('x',dx.x);
+ pu=mode==='single'?S[DEX].p:med;$('#pu').textContent=fm(pu);
+ const lim=.75*10*pu;$('#bl2').textContent=fm(lim);
+ parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.l-=p.dc;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});
+ requestAnimationFrame(frame)}
+function spark(x,y,c,n=8,sp=2.4,g=.03){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g,l:1,dc:.03,e:mk('circle',{r:1.2+Math.random()*2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+requestAnimationFrame(frame);
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const s=performance.now();(function f(t){const p=Math.min(1,(t-s)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(s)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+function fly(x0,y0,x1,y1,col,ms,arc=-30){const c=mk('circle',{r:3.6,fill:col,filter:'url(#gw)'},$('#parts')),mx=(x0+x1)/2,my=(y0+y1)/2+arc;
+ return tween(0,1,ms,p=>{const q=1-p,x=q*q*x0+2*q*p*mx+p*p*x1,y=q*q*y0+2*q*p*my+p*p*y1;c.setAttribute('cx',x);c.setAttribute('cy',y)},eio).then(()=>{c.remove();spark(x1,y1,col,5,1.6)})}
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+function shock(s,col){const r=mk('circle',{cx:s.x,cy:Y(s.p),r:8,fill:'none',stroke:col,'stroke-width':3,filter:'url(#gw)'},$('#parts'));tween(0,1,600,p=>{r.setAttribute('r',8+50*p);r.setAttribute('opacity',1-p)}).then(()=>r.remove())}
+function setBorrowed(v){borrowed=v;$('#bo').textContent=fm(v)}
+function setBad(v){bad=v;$('#bd').textContent=fm(v);$('#bd').setAttribute('fill',v>0?'#ff3b4e':'#39ff88')}
+function status(t,c){$('#stx').textContent=t;$('#stx').setAttribute('fill',c||'#39ff88')}
+let jit=null;
+function startJitter(){stopJitter();jit=setInterval(()=>{for(const s of S)if(s.vis&&!s.man)s.t=TRUE+(Math.random()-.5)*26},650)}
+function stopJitter(){if(jit)clearInterval(jit);jit=null}
+function reset(){stopJitter();for(const s of S){s.p=TRUE;s.t=TRUE;s.vis=false;s.man=false;s.out=false}mode='single';setBorrowed(0);setBad(0);status('');
+ ['#dl','#fl','#ag','#stamp','#bl'].forEach(x=>$(x).classList.remove('on'));$('#band').setAttribute('opacity',0);$('#bg').classList.remove('on');$('#rwt').setAttribute('opacity',0);stage.classList.remove('rw')}
+async function manip(i,price,ms=1200){const s=S[i];s.man=true;s.t=price;shock(s,'#ffd23f');spark(s.x,Y(s.p),'#ffd23f',14,2.8);await sleep(ms);}
+
+async function main(){
+ reset();scene('s1');note('Smart contracts can’t look up prices on their own. They depend on an oracle to tell them what ETH is worth.');await sleep(3000);
+ S[DEX].vis=true;$('#band').setAttribute('opacity',.9);$('#bl').classList.add('on');$('#dl').classList.add('on');startJitter();
+ note('This lending protocol reads ETH’s price from a single DEX pool. An attacker deposits 10 ETH as collateral: $20,000 at $2,000.','warn');await sleep(3800);
+ $('#ag').classList.add('on');note('Using a flash loan, the attacker dumps a huge buy into that one pool and shoots its spot price up to $3,500.','bad');await sleep(1800);
+ $('#fl').setAttribute('x',S[DEX].x+34);$('#fl').setAttribute('y',Y(3300));$('#fl').classList.add('on');stopJitter();await manip(DEX,3500,1500);
+ note('The protocol now believes the collateral is worth $35,000, so the borrow limit jumps to $26,250. The attacker borrows $26,000.','bad');
+ const fs=[];for(let k=0;k<10;k++)fs.push(sleep(k*80).then(()=>fly(162,360,296,52,'#ffd23f',800)));
+ const bt=tween(0,26000,1100,v=>setBorrowed(v),eio);await Promise.all([...fs,bt]);await sleep(1400);
+ S[DEX].t=TRUE;S[DEX].man=false;$('#fl').classList.remove('on');stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),900);
+ note('The loan is repaid and the pool price snaps back to $2,000. The collateral is only worth $20,000 against $26,000 of debt.','bad');await sleep(2200);
+ setBad(6000);$('#stamp').classList.add('on');status('✘ protocol is left with $6,000 of bad debt','#ff3b4e');await sleep(3200);
+ /* rewind: decentralized oracle */
+ $('#stamp').classList.remove('on');stage.classList.add('rw');$('#rwt').setAttribute('opacity',1);await sleep(1200);
+ reset();S[DEX].vis=true;$('#band').setAttribute('opacity',.9);$('#bl').classList.add('on');$('#ag').classList.add('on');stage.classList.add('rw');$('#rwt').setAttribute('opacity',1);await sleep(500);stage.classList.remove('rw');$('#rwt').setAttribute('opacity',0);
+ mode='multi';note('Rewind. Now the protocol uses a decentralized oracle: nine independent nodes fetch prices from many sources and report them.','good');
+ for(const i of[0,8,1,7,2,6,3,5]){S[i].vis=true;S[i].p=TRUE+(Math.random()-.5)*20;await sleep(220)}$('#dl').classList.remove('on');startJitter();await sleep(2400);
+ note('The attacker bends the DEX pool again, but that is just one source out of nine.','warn');stopJitter();await manip(DEX,3500,1600);
+ note('One bad price is an outlier. The median ignores it, so the protocol still sees $2,000.','good');await sleep(2800);
+ note('The attacker tries to borrow $26,000 against the manipulated price…','warn');await sleep(1200);
+ status('✘ REVERT: exceeds borrow limit ($15,000)','#ff3b4e');stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),700);spark(162,360,'#ff3b4e',24,3);
+ note('Reverted. The borrow limit is still based on the true price.','good');await sleep(3000);status('');
+ note('Even if four of nine sources are corrupted, the median stays honest.','warn');for(const i of[1,6,7]){await manip(i,3300+Math.random()*250,500)}await sleep(2800);
+ note('Only by corrupting a majority of independent sources can an attacker move it. That costs a fortune, and feeds add TWAPs and deviation checks on top.','good');
+ await manip(2,3400,900);await sleep(2800);
+ stopJitter();for(const s of S){s.man=false;s.t=TRUE}await sleep(1400);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>

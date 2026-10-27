@@ -114,5 +114,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 11 · MEV Sandwich Attack.html",
+    "title": "🕳️ Your Swap Got Sandwiched: MEV Explained",
+    "video": "VIZ 11 · MEV Sandwich Attack.mp4",
+    "timestamp": "2026-10-27T15:02:51Z",
+    "publish": {
+      "instagram": {
+        "id": "18081628328373170",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1474224584522153",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
