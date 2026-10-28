@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Bitcoin UTXO Model · How Transactions Consume Coins, Create Change and Prevent Double Spending (Flow Ribbon Explainer Reel)</title>
+<style>
+:root{--bg:#050308;--c:#29d9ff;--v:#9b6bff;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#f0e8e0;--d:#9a8a80;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;left:-90px;top:60px;background:#7a4a00}
+.b2{width:250px;height:250px;right:-100px;top:330px;background:#3a1b9a;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#7a2a00;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:33px;line-height:1.06;margin:145px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--y),var(--o));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(255,170,40,.8))}
+.sub{color:#cdbfb0;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #4a3418;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(20,12,6,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,46,6,.86);color:#ffe9a8}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #4a3418;background:rgba(20,12,6,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--y)}
+.big{margin-top:20px;font-size:24px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--y),var(--o));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.fd{opacity:0;transition:opacity .4s}.fd.on{opacity:1}
+.cn{opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.3);transition:opacity .4s,transform .4s}
+.cn.on{opacity:1;transform:none}
+.cn.sp{opacity:.4;filter:grayscale(1)}
+.flow{stroke-dasharray:3 9;animation:fl .9s linear infinite}
+@keyframes fl{to{stroke-dashoffset:-24}}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>Bitcoin has<br>no balances.<br>Only <em>coins.</em></h1>
+  <div class="sub">The UTXO model: how transactions consume coins, create change, and make double spending impossible.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>How Bitcoin spends coins</h2>
+  <svg viewBox="0 0 324 438" width="324" height="438">
+   <defs>
+    <radialGradient id="cg" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff6c0"/><stop offset=".5" stop-color="#ffb020"/><stop offset="1" stop-color="#8a4a00"/></radialGradient>
+    <radialGradient id="cgn" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#d6ffe6"/><stop offset=".5" stop-color="#39ff88"/><stop offset="1" stop-color="#0a5a2a"/></radialGradient>
+    <linearGradient id="rb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffb020"/><stop offset="1" stop-color="#ff5fd2"/></linearGradient>
+    <filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   </defs>
+   <text x="48" y="22" fill="#ffd23f" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1.5">ALICE</text>
+   <text x="280" y="62" fill="#29d9ff" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1.5">BOB</text>
+   <text x="280" y="330" fill="#ff9d3d" font-size="8.5" font-weight="700" text-anchor="middle" letter-spacing="1.5">⛏ MINER</text>
+   <circle cx="48" cy="312" r="14" fill="none" stroke="#4a3418" stroke-dasharray="3 4" opacity=".7"/>
+   <g id="rbs"></g>
+   <g id="txg" class="fd"><polygon id="hx" points="" fill="#1a1230" stroke="#9b6bff" stroke-width="2" filter="url(#gw)"/><text x="170" y="186" fill="#e8e0ff" font-size="9" font-weight="700" text-anchor="middle" letter-spacing="1">TX</text><text x="170" y="198" fill="#b79bff" font-size="6.5" text-anchor="middle">consumes + creates</text></g>
+   <text id="eq" class="fd" x="170" y="238" fill="#ffe9a8" font-size="8.5" text-anchor="middle">0.30 + 0.20 = 0.40 + 0.09 + 0.01</text>
+   <g id="nds" class="fd"><text x="170" y="40" fill="#8f86b0" font-size="7" text-anchor="middle" letter-spacing="1.2">NODES CHECK THE UTXO SET</text></g>
+   <g id="coins"></g>
+   <g id="parts"></g>
+   <rect x="6" y="352" width="152" height="50" rx="12" fill="rgba(20,12,6,.88)" stroke="#4a3418"/>
+   <text x="16" y="367" fill="#9a8a80" font-size="7" letter-spacing="1">ALICE BALANCE (SUM OF HER COINS)</text><text id="bal" x="16" y="391" fill="#ffd23f" font-size="19" font-weight="700">1.00 BTC</text>
+   <rect x="166" y="352" width="152" height="50" rx="12" fill="rgba(20,12,6,.88)" stroke="#4a3418"/>
+   <text x="176" y="367" fill="#9a8a80" font-size="7" letter-spacing="1">UNSPENT COINS (UTXO SET)</text><text id="us" x="176" y="391" fill="#29d9ff" font-size="19" font-weight="700">4</text>
+   <text id="stx" x="162" y="424" fill="#39ff88" font-size="10" font-weight="700" text-anchor="middle"></text>
+   <g id="stamp" class="fd"><text id="stt" x="170" y="150" fill="#ff3b4e" font-size="22" font-weight="900" text-anchor="middle" transform="rotate(-7 170 144)" style="paint-order:stroke;stroke:#050308;stroke-width:5px">REJECTED</text></g>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">Key ideas</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🪙 <b>Coins, not balances.</b> Your balance is the sum of coins you can spend.</div>
+   <div class="ln" id="l2">✂ <b>Spend whole coins.</b> Anything left over comes back as change.</div>
+   <div class="ln" id="l3">🔥 <b>Spent coins are consumed.</b> Reusing one is rejected by every node.</div>
+   <div class="ln" id="l4">⛏ <b>Leftover inputs are the fee</b> that rewards the miner.</div>
+  </div>
+  <div class="big" id="bg">Every coin spends once.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#ffe9a0':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+const TXC=[170,196];
+$('#hx').setAttribute('points',[0,1,2,3,4,5].map(i=>{const a=Math.PI/6+i*Math.PI/3;return (TXC[0]+34*Math.cos(a)).toFixed(1)+','+(TXC[1]+34*Math.sin(a)).toFixed(1)}).join(' '));
+function coin(amt,x,y,green){const r=8+amt*30,g=mk('g',{class:'cn'},$('#coins'));
+ const ring=mk('circle',{cx:x,cy:y,r:r+5,fill:'none',stroke:'#ffd23f','stroke-width':2,opacity:0},g);
+ mk('circle',{cx:x,cy:y,r,fill:green?'url(#cgn)':'url(#cg)',filter:'url(#gw)'},g);
+ mk('text',{x,y:y+3,fill:'#2a1400','font-size':Math.max(7,r*.55),'font-weight':700,'text-anchor':'middle'},g).textContent=amt.toFixed(2);
+ const x2=mk('text',{x,y:y+4,fill:'#ff3b4e','font-size':r*1.2,'font-weight':900,'text-anchor':'middle',opacity:0},g);x2.textContent='✘';
+ return{g,x,y,r,ring,x2,amt}}
+const A=[[.30,48,78],[.20,48,138],[.15,48,198],[.35,48,258]].map(([a,x,y])=>coin(a,x,y));
+const BOB=coin(.40,280,100,true),CHG=coin(.09,48,312,true),FEE=coin(.01,280,296,true);
+const nodes=[0,1,2].map(i=>{const x=130+i*40,c=mk('circle',{cx:x,cy:62,r:8,fill:'#14102e',stroke:'#4a4a8a','stroke-width':1.6},$('#nds'));return{x,c}});
+let parts=[];
+function spark(x,y,c,n=10,sp=2.4,g=.03){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g,l:1,dc:.028,e:mk('circle',{r:1.2+Math.random()*2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+function frame(){parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.l-=p.dc;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const s=performance.now();(function f(t){const p=Math.min(1,(t-s)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(s)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+const rbs=[];
+async function ribbon(x0,y0,x1,y1,w,col){const d=`M${x0} ${y0}C${x0+(x1-x0)*.55} ${y0},${x1-(x1-x0)*.55} ${y1},${x1} ${y1}`;
+ const p=mk('path',{d,fill:'none',stroke:col||'url(#rb)','stroke-width':w,opacity:.55,filter:'url(#gw)'},$('#rbs')),f=mk('path',{d,fill:'none',stroke:'#fff','stroke-width':1.4,opacity:.8,class:'flow'},$('#rbs'));rbs.push(p,f);
+ const L=p.getTotalLength();p.setAttribute('stroke-dasharray',L);f.setAttribute('opacity',0);await tween(L,0,900,v=>p.setAttribute('stroke-dashoffset',v),eio);p.removeAttribute('stroke-dasharray');f.setAttribute('opacity',.8)}
+function setBal(v){$('#bal').textContent=v.toFixed(2)+' BTC'}
+function status(t,c){$('#stx').textContent=t;$('#stx').setAttribute('fill',c||'#39ff88')}
+function reset(){[...A,BOB,CHG,FEE].forEach(c=>{c.g.setAttribute('class','cn');c.ring.setAttribute('opacity',0);c.x2.setAttribute('opacity',0)});rbs.splice(0).forEach(e=>e.remove());
+ ['#txg','#eq','#nds','#stamp'].forEach(s=>$(s).classList.remove('on'));setBal(1);$('#us').textContent='4';status('');nodes.forEach(n=>n.c.setAttribute('stroke','#4a4a8a'));$('#bg').classList.remove('on')}
+const on=c=>c.g.classList.add('on');
+async function main(){
+ reset();scene('s1');note('Bitcoin has no account balances. Your “balance” is simply the sum of the coins (UTXOs) you are able to spend.');
+ await sleep(1200);for(const c of A){on(c);await sleep(380)}await sleep(2200);
+ note('Alice wants to pay Bob 0.40 BTC. Her wallet picks coins worth at least that much: 0.30 and 0.20.','warn');
+ A[0].ring.setAttribute('opacity',1);A[1].ring.setAttribute('opacity',1);spark(A[0].x,A[0].y,'#ffd23f',10,2);spark(A[1].x,A[1].y,'#ffd23f',10,2);await sleep(2600);
+ $('#txg').classList.add('on');note('A transaction consumes whole coins as inputs, then creates brand-new coins as outputs.');await sleep(1600);
+ await Promise.all([ribbon(A[0].x+A[0].r,A[0].y,TXC[0]-30,TXC[1]-8,A[0].amt*40),ribbon(A[1].x+A[1].r,A[1].y,TXC[0]-30,TXC[1]+8,A[1].amt*40)]);
+ for(const c of[A[0],A[1]]){c.g.classList.add('sp');c.x2.setAttribute('opacity',1);c.ring.setAttribute('opacity',0);spark(c.x,c.y,'#ff9d3d',16,2.6)}
+ $('#eq').classList.add('on');setBal(.5);note('The inputs are burned up: 0.30 + 0.20 = 0.50 BTC goes into the transaction.','warn');await sleep(2400);
+ note('Out come new coins: 0.40 for Bob, 0.09 back to Alice as change, and 0.01 left over as the miner’s fee.','good');
+ await Promise.all([ribbon(TXC[0]+30,TXC[1]-8,BOB.x-BOB.r,BOB.y,.40*40,'#29d9ff'),ribbon(TXC[0]-20,TXC[1]+28,CHG.x+CHG.r,CHG.y,.09*40,'#39ff88'),ribbon(TXC[0]+30,TXC[1]+10,FEE.x-FEE.r,FEE.y,2,'#ffd23f')]);
+ on(BOB);on(CHG);on(FEE);spark(BOB.x,BOB.y,'#39ff88',20,2.8);spark(CHG.x,CHG.y,'#39ff88',14,2.4);spark(FEE.x,FEE.y,'#ffd23f',10,2);
+ setBal(.59);$('#us').textContent='5';status('✔ inputs 0.50 = outputs 0.40 + 0.09 + fee 0.01','#39ff88');await sleep(3400);status('');
+ /* double spend */
+ note('Now Alice tries to spend that consumed 0.30 coin a second time…','bad');$('#nds').classList.add('on');await sleep(2200);
+ const pk=mk('circle',{r:6,fill:'#ff3b4e',filter:'url(#gw)',cx:A[0].x,cy:A[0].y},$('#parts'));
+ await tween(0,1,900,p=>{pk.setAttribute('cx',A[0].x+(130-A[0].x)*p);pk.setAttribute('cy',A[0].y+(62-A[0].y)*p-Math.sin(Math.PI*p)*14)},eio);
+ nodes.forEach(n=>n.c.setAttribute('stroke','#ff3b4e'));spark(130,62,'#ff3b4e',20,3);stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),800);
+ await tween(0,1,700,p=>{pk.setAttribute('cx',130-90*p);pk.setAttribute('cy',62+10*p)},eio);pk.remove();
+ $('#stamp').classList.add('on');status('✘ input already spent: rejected by every node','#ff3b4e');
+ note('Every node checks the UTXO set. That coin no longer exists, so the transaction is rejected. Double spending is impossible.','good');await sleep(4200);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>

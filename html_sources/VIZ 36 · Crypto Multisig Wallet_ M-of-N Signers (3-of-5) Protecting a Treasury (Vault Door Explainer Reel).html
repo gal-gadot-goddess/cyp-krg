@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Crypto Multisig Wallet · M-of-N Signers (3-of-5) Protecting a Treasury (Vault Door Explainer Reel)</title>
+<style>
+:root{--bg:#04030c;--c:#29d9ff;--v:#9b6bff;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#ece8f8;--d:#8f86b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;left:-90px;top:60px;background:#2a2a8a}
+.b2{width:250px;height:250px;right:-100px;top:330px;background:#8a6a00;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#7a1b6a;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:33px;line-height:1.06;margin:140px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--y),var(--o));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(255,170,40,.8))}
+.sub{color:#bdb3dc;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #2e2460;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(12,8,30,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,46,6,.86);color:#ffe9a8}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #2e2460;background:rgba(12,8,30,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--y)}
+.big{margin-top:20px;font-size:22px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--y),var(--o));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.fd{opacity:0;transition:opacity .4s}.fd.on{opacity:1}
+.rot{animation:rot 12s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes rot{to{transform:rotate(360deg)}}
+.pip{fill:#14102e;stroke:#4a3c90;stroke-width:1.5;transition:all .3s}
+.pip.on{fill:#39ff88;stroke:#39ff88;filter:drop-shadow(0 0 6px #39ff88)}
+.sg circle.o{fill:#14102e;stroke:#4a4a8a;stroke-width:1.8;transition:all .3s}
+.sg.ok circle.o{stroke:#39ff88;fill:#07301a;filter:drop-shadow(0 0 7px #39ff88)}
+.sg.bad circle.o{stroke:#ff3b4e;fill:#2a0a12;filter:drop-shadow(0 0 7px #ff3b4e)}
+.kh{fill:#0a0818;stroke:#6a6a9a;stroke-width:1.6;transition:all .3s}
+.kh.ok{stroke:#39ff88;fill:#07301a;filter:drop-shadow(0 0 6px #39ff88)}
+.kh.bad{stroke:#ff3b4e;fill:#2a0a12;filter:drop-shadow(0 0 6px #ff3b4e)}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>No single key<br>can open the<br><em>vault.</em></h1>
+  <div class="sub">Multisig wallets (like Safe): how M-of-N approvals protect a treasury.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>Multisig security</h2>
+  <svg viewBox="0 0 324 436" width="324" height="436">
+   <defs>
+    <linearGradient id="st" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a82a8"/><stop offset=".5" stop-color="#2a3050"/><stop offset="1" stop-color="#9aa2c8"/></linearGradient>
+    <radialGradient id="fc" cx=".4" cy=".35" r=".9"><stop offset="0" stop-color="#2e3558"/><stop offset="1" stop-color="#0c1028"/></radialGradient>
+    <radialGradient id="tr" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#fff6c0"/><stop offset=".5" stop-color="#ffb020"/><stop offset="1" stop-color="#5a2a00"/></radialGradient>
+    <filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   </defs>
+   <rect id="bn" class="fd" x="6" y="2" width="312" height="26" rx="9" fill="rgba(12,8,30,.9)" stroke="#2e2460"/>
+   <text id="bt" class="fd" x="162" y="19" fill="#ece8f8" font-size="9.5" text-anchor="middle"></text>
+   <!-- vault interior -->
+   <g id="inn" opacity="0"><circle cx="162" cy="170" r="100" fill="url(#tr)"/><g class="rot" id="rays"></g><text x="162" y="180" font-size="34" text-anchor="middle">💰</text></g>
+   <circle cx="162" cy="170" r="112" fill="none" stroke="url(#st)" stroke-width="12"/>
+   <circle cx="162" cy="170" r="118" fill="none" stroke="#1a2040" stroke-width="2"/>
+   <g id="door">
+    <circle cx="162" cy="170" r="100" fill="url(#fc)" stroke="#4a5280" stroke-width="2"/>
+    <circle cx="162" cy="170" r="88" fill="none" stroke="#3a4270" stroke-width="1.2" stroke-dasharray="3 6"/>
+    <circle cx="162" cy="170" r="48" fill="none" stroke="#3a4270" stroke-width="1.2"/>
+    <g id="bolts"></g><g id="khs"></g>
+    <g id="wheel"><circle cx="162" cy="170" r="22" fill="#1c2244" stroke="#8a93c0" stroke-width="2.5"/><g id="spk"></g><circle cx="162" cy="170" r="7" fill="#ffd23f" filter="url(#gw)"/></g>
+    <text id="lk" x="162" y="214" fill="#ffd23f" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1.5">LOCKED</text>
+   </g>
+   <g id="sgs"></g>
+   <g id="kfx"></g>
+   <g id="parts"></g>
+   <rect x="6" y="352" width="152" height="54" rx="12" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text x="16" y="367" fill="#8f86b0" font-size="7" letter-spacing="1">TREASURY</text><text id="tv" x="16" y="392" fill="#ffd23f" font-size="17" font-weight="700">$10,000,000</text>
+   <rect x="166" y="352" width="152" height="54" rx="12" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text id="ap" x="176" y="367" fill="#8f86b0" font-size="7" letter-spacing="1">APPROVALS · 3 OF 5 NEEDED</text>
+   <g id="pips"></g>
+   <text id="stx" x="162" y="426" fill="#39ff88" font-size="10" font-weight="700" text-anchor="middle"></text>
+   <g id="stamp" class="fd"><text id="stt" x="162" y="176" fill="#ff3b4e" font-size="24" font-weight="900" text-anchor="middle" transform="rotate(-8 162 168)" style="paint-order:stroke;stroke:#04030c;stroke-width:5px">REJECTED</text></g>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">Why multisig works</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🔐 <b>M-of-N approvals.</b> No single key can move the funds.</div>
+   <div class="ln" id="l2">🧑‍🤝‍🧑 <b>Spread the keys</b> across people, devices and locations.</div>
+   <div class="ln" id="l3">🧊 <b>Pair with hardware wallets</b> so keys never touch a browser.</div>
+   <div class="ln" id="l4">📜 <b>Read every proposal.</b> A signature is a decision, not a click.</div>
+  </div>
+  <div class="big" id="bg">No single key can break the vault.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#ffe9a0':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+const CX=162,CY=170,NAMES=['ALICE','BOB','CAROL','DAN','EVE'],FACE=['👩','🧑','👨','👵','🧔'];
+for(let i=0;i<6;i++){const a=i*Math.PI/3;mk('line',{x1:CX+Math.cos(a)*8,y1:CY+Math.sin(a)*8,x2:CX+Math.cos(a)*20,y2:CY+Math.sin(a)*20,stroke:'#8a93c0','stroke-width':3,'stroke-linecap':'round'},$('#spk'))}
+for(let i=0;i<14;i++){const a=i*Math.PI/7;mk('line',{x1:CX,y1:CY,x2:CX+Math.cos(a)*98,y2:CY+Math.sin(a)*98,stroke:'#fff3b0','stroke-width':3,opacity:.35},$('#rays'))}
+const KH=[],BO=[],SG=[];
+for(let k=0;k<5;k++){const a=-Math.PI/2+k*2*Math.PI/5,kx=CX+62*Math.cos(a),ky=CY+62*Math.sin(a);
+ const bl=mk('line',{x1:CX+74*Math.cos(a),y1:CY+74*Math.sin(a),x2:CX+118*Math.cos(a),y2:CY+118*Math.sin(a),stroke:'#8a93c0','stroke-width':9,'stroke-linecap':'round'},$('#bolts'));
+ const kh=mk('circle',{cx:kx,cy:ky,r:10,class:'kh'},$('#khs'));mk('line',{x1:kx,y1:ky-3,x2:kx,y2:ky+5,stroke:'#6a6a9a','stroke-width':2.2,'stroke-linecap':'round'},$('#khs'));
+ KH.push({x:kx,y:ky,kh,a});BO.push({bl,a,r:118});
+ const sx=34+k*64,g=mk('g',{class:'sg'},$('#sgs'));mk('circle',{cx:sx,cy:312,r:17,class:'o'},g);mk('text',{x:sx,y:318,'font-size':17,'text-anchor':'middle'},g).textContent=FACE[k];mk('text',{x:sx,y:343,fill:'#8f86b0','font-size':7,'text-anchor':'middle','letter-spacing':1},g).textContent=NAMES[k];SG.push({x:sx,y:312,g})}
+const PIP=[];for(let i=0;i<3;i++)PIP.push(mk('circle',{cx:190+i*36,cy:388,r:10,class:'pip'},$('#pips')));
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const s=performance.now();(function f(t){const p=Math.min(1,(t-s)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(s)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+let parts=[];
+function spark(x,y,c,n=10,sp=2.4,g=.03){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g,l:1,dc:.028,e:mk('circle',{r:1.2+Math.random()*2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+function frame(){parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.l-=p.dc;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+function banner(t,col){$('#bt').textContent=t;$('#bt').setAttribute('fill',col||'#ece8f8');$('#bn').classList.add('on');$('#bt').classList.add('on')}
+function hideBanner(){$('#bn').classList.remove('on');$('#bt').classList.remove('on')}
+function status(t,c){$('#stx').textContent=t;$('#stx').setAttribute('fill',c||'#39ff88')}
+let cnt=0;function setCnt(n){cnt=n;PIP.forEach((p,i)=>p.classList.toggle('on',i<n));$('#ap').textContent='APPROVALS · '+n+' OF 3 NEEDED'}
+function setBolt(k,r){const b=BO[k];b.r=r;b.bl.setAttribute('x2',CX+r*Math.cos(b.a));b.bl.setAttribute('y2',CY+r*Math.sin(b.a))}
+function setDoor(sx){$('#door').setAttribute('transform',`translate(62 0) scale(${sx} 1) translate(-62 0)`)}
+async function approve(k,bad){const s=SG[k],K=KH[k],e=mk('text',{x:s.x,y:s.y,'font-size':18,'text-anchor':'middle'},$('#kfx'));e.textContent='🔑';
+ s.g.classList.add(bad?'bad':'ok');
+ await tween(0,1,700,p=>{const x=s.x+(K.x-s.x)*p,y=s.y+(K.y-s.y)*p-Math.sin(Math.PI*p)*30;e.setAttribute('x',x);e.setAttribute('y',y);e.setAttribute('transform',`rotate(${p*90} ${x} ${y})`)},eio);
+ e.remove();K.kh.setAttribute('class','kh '+(bad?'bad':'ok'));spark(K.x,K.y,bad?'#ff3b4e':'#39ff88',12,2);
+ await tween(118,98,380,r=>setBolt(k,r),eio);setCnt(cnt+1)}
+async function relock(){await Promise.all(BO.map((b,k)=>tween(b.r,118,400,r=>setBolt(k,r),eio)));KH.forEach(k=>k.kh.setAttribute('class','kh'));SG.forEach(s=>s.g.setAttribute('class','sg'));setCnt(0)}
+async function jam(){let sp=0;await tween(0,1,900,p=>{$('#wheel').setAttribute('transform',`rotate(${Math.sin(p*18)*10*(1-p*.3)} ${CX} ${CY})`)});$('#wheel').setAttribute('transform','');
+ stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),700);
+ await tween(0,1,500,p=>$('#door').setAttribute('transform',`translate(${Math.sin(p*30)*3} 0)`));$('#door').setAttribute('transform','')}
+function reset(){setDoor(1);$('#inn').setAttribute('opacity',0);for(let k=0;k<5;k++)setBolt(k,118);KH.forEach(k=>k.kh.setAttribute('class','kh'));SG.forEach(s=>s.g.setAttribute('class','sg'));setCnt(0);
+ $('#tv').textContent='$10,000,000';status('');hideBanner();$('#stamp').classList.remove('on');$('#lk').textContent='LOCKED';$('#lk').setAttribute('fill','#ffd23f');$('#bg').classList.remove('on')}
+async function main(){
+ reset();scene('s1');note('A multisig wallet needs several approvals to move funds. This treasury holds $10M and requires 3 of 5 signers.');await sleep(3600);
+ /* attack 1 */
+ note('A hacker steals Alice’s key and tries to drain the treasury.','bad');banner('PROPOSAL: send $10,000,000 to 0xBAD…','#ff8a97');await sleep(1800);
+ await approve(0,true);status('1 of 3 approvals…','#ff9d3d');await sleep(500);await jam();
+ $('#stt').textContent='REJECTED';$('#stamp').classList.add('on');status('✘ only 1 of 3: funds stay locked','#ff3b4e');note('One stolen key is not enough. The door stays locked and the transaction is rejected.','good');await sleep(3200);
+ $('#stamp').classList.remove('on');status('');await relock();hideBanner();await sleep(600);
+ /* honest */
+ note('A normal payment: signers review the proposal and approve with their own keys.','warn');banner('PROPOSAL #7: pay 50,000 USDC to a contributor','#ffe9a8');await sleep(2200);
+ for(const k of[1,2,3]){await approve(k,false);await sleep(400);if(k===1)note('Bob approves. 1 of 3…','warn');if(k===2)note('Carol approves. 2 of 3…','warn')}
+ note('The third approval arrives. The bolts retract and the vault opens.','good');
+ $('#lk').textContent='UNLOCKED';$('#lk').setAttribute('fill','#39ff88');
+ await tween(0,1,900,p=>$('#wheel').setAttribute('transform',`rotate(${p*540} ${CX} ${CY})`),eio);
+ $('#inn').setAttribute('opacity',1);spark(CX,CY,'#ffd23f',40,3.4);await tween(1,.12,1500,sx=>setDoor(sx),eio);
+ for(let k=0;k<12;k++){const c=mk('circle',{r:3.6,fill:'#ffd23f',filter:'url(#gw)',cx:CX,cy:CY},$('#parts'));const tx=290+Math.random()*10,ty=20;tween(0,1,700,p=>{c.setAttribute('cx',CX+(tx-CX)*p);c.setAttribute('cy',CY+(ty-CY)*p-Math.sin(Math.PI*p)*30)},eio).then(()=>c.remove());await sleep(60)}
+ $('#tv').textContent='$9,950,000';status('✔ executed: 50,000 USDC sent','#39ff88');await sleep(3000);
+ await tween(.12,1,1000,sx=>setDoor(sx),eio);$('#inn').setAttribute('opacity',0);$('#wheel').setAttribute('transform','');status('');hideBanner();await relock();$('#lk').textContent='LOCKED';$('#lk').setAttribute('fill','#ffd23f');await sleep(600);
+ /* attack 2 */
+ note('Even if the hacker steals TWO keys (Alice and Eve)…','bad');banner('PROPOSAL: send $9,950,000 to 0xBAD…','#ff8a97');await sleep(1800);
+ await approve(0,true);await approve(4,true);status('2 of 3 approvals…','#ff9d3d');await sleep(500);await jam();
+ $('#stamp').classList.add('on');status('✘ only 2 of 3: still locked','#ff3b4e');note('Still locked. The attacker would need to compromise three separate people and devices.','good');await sleep(3200);
+ $('#stamp').classList.remove('on');status('');await relock();hideBanner();
+ note('And if two signers lose their keys, the other three can still approve. There is no single point of failure.','good');
+ for(const k of[1,2,3])SG[k].g.classList.add('ok');await sleep(3200);SG.forEach(s=>s.g.setAttribute('class','sg'));
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>

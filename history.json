@@ -137,5 +137,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ_12_Life_of_a_Bitcoin_Transaction.html",
+    "title": "Bitcoin Transaction: How It Really Gets Confirmed ⚡⛓️",
+    "video": "VIZ_12_Life_of_a_Bitcoin_Transaction.mp4",
+    "timestamp": "2026-10-28T15:37:50Z",
+    "publish": {
+      "instagram": {
+        "id": "18119132515798086",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1431980085023921",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
