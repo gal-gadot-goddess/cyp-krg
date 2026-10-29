@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Cosmos IBC Cross-Chain Messaging · Light Client Proof Verification and Untrusted Relayers (Twin Planets Explainer Reel)</title>
+<style>
+:root{--bg:#02040c;--c:#29d9ff;--v:#9b6bff;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#e8eef8;--d:#7f93b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;left:-100px;top:90px;background:#0b4a9a}
+.b2{width:260px;height:260px;right:-110px;top:230px;background:#6a1b9a;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#0b6a7a;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:33px;line-height:1.06;margin:145px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--c),var(--v));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(41,217,255,.8))}
+.sub{color:#b4c4e0;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #1d3458;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(6,12,28,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,46,6,.86);color:#ffe9a8}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #1d3458;background:rgba(6,12,28,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+.big{margin-top:20px;font-size:24px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--c),var(--v));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.fd{opacity:0;transition:opacity .45s}.fd.on{opacity:1}
+.gt{transform-box:fill-box;transform-origin:center;animation:rot 9s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>Two chains.<br>No <em>trusted bridge.</em></h1>
+  <div class="sub">IBC and light clients: how blockchains verify each other’s messages instead of trusting a middleman.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>Cross-chain messaging with IBC</h2>
+  <svg viewBox="0 0 324 440" width="324" height="440">
+   <defs>
+    <radialGradient id="pa" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#bfeaff"/><stop offset=".45" stop-color="#29a0ff"/><stop offset="1" stop-color="#0a1a5a"/></radialGradient>
+    <radialGradient id="pb" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#e6d0ff"/><stop offset=".45" stop-color="#9b6bff"/><stop offset="1" stop-color="#2a0a5a"/></radialGradient>
+    <filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="bl" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="10"/></filter>
+   </defs>
+   <circle cx="62" cy="200" r="52" fill="#29a0ff" opacity=".28" filter="url(#bl)"/>
+   <circle cx="262" cy="200" r="52" fill="#9b6bff" opacity=".28" filter="url(#bl)"/>
+   <circle cx="62" cy="200" r="38" fill="url(#pa)" filter="url(#gw)"/>
+   <circle cx="262" cy="200" r="38" fill="url(#pb)" filter="url(#gw)"/>
+   <text x="62" y="204" fill="#04122a" font-size="9" font-weight="700" text-anchor="middle" letter-spacing="1">CHAIN A</text>
+   <text x="262" y="204" fill="#1a0a3a" font-size="9" font-weight="700" text-anchor="middle" letter-spacing="1">CHAIN B</text>
+   <g id="vA"></g><g id="vB"></g>
+   <!-- light client gates -->
+   <g id="gB" class="fd"><g class="gt"><circle cx="204" cy="200" r="20" fill="none" stroke="#9b6bff" stroke-width="2" stroke-dasharray="6 5" filter="url(#gw)"/></g><circle id="gBc" cx="204" cy="200" r="13" fill="rgba(12,8,30,.8)" stroke="#9b6bff" stroke-width="1.6"/><text x="204" y="203" font-size="9" text-anchor="middle">🔭</text><text x="204" y="232" fill="#b79bff" font-size="6.5" text-anchor="middle" letter-spacing="1">LIGHT CLIENT OF A</text></g>
+   <g id="gA" class="fd"><g class="gt"><circle cx="120" cy="200" r="20" fill="none" stroke="#29d9ff" stroke-width="2" stroke-dasharray="6 5" filter="url(#gw)"/></g><circle id="gAc" cx="120" cy="200" r="13" fill="rgba(6,12,28,.8)" stroke="#29d9ff" stroke-width="1.6"/><text x="120" y="203" font-size="9" text-anchor="middle">🔭</text><text x="120" y="232" fill="#8ad8ff" font-size="6.5" text-anchor="middle" letter-spacing="1">LIGHT CLIENT OF B</text></g>
+   <g id="bm"></g>
+   <g id="obj"></g>
+   <g id="parts"></g>
+   <text id="rl" class="fd" x="162" y="102" fill="#ffd23f" font-size="7.5" text-anchor="middle" letter-spacing="1">RELAYER · untrusted courier</text>
+   <rect x="6" y="300" width="152" height="52" rx="12" fill="rgba(6,12,28,.88)" stroke="#1d3458"/>
+   <text x="16" y="315" fill="#7f93b0" font-size="7" letter-spacing="1">LOCKED ON CHAIN A</text><text id="la" x="16" y="340" fill="#29d9ff" font-size="19" font-weight="700">0 TOKEN</text>
+   <rect x="166" y="300" width="152" height="52" rx="12" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text x="176" y="315" fill="#7f93b0" font-size="7" letter-spacing="1">MINTED ON CHAIN B</text><text id="mb" x="176" y="340" fill="#b79bff" font-size="19" font-weight="700">0 ibc/TOKEN</text>
+   <text id="stx" x="162" y="382" fill="#39ff88" font-size="10" font-weight="700" text-anchor="middle"></text>
+   <text id="stx2" x="162" y="398" fill="#7f93b0" font-size="8" text-anchor="middle"></text>
+   <g id="stamp" class="fd"><text id="stt" x="162" y="150" fill="#ff3b4e" font-size="22" font-weight="900" text-anchor="middle" transform="rotate(-6 162 144)" style="paint-order:stroke;stroke:#02040c;stroke-width:5px">PROOF FAILED</text></g>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">Why it’s trust-minimized</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🔭 <b>Light clients</b> verify the other chain’s headers and proofs.</div>
+   <div class="ln" id="l2">🚚 <b>Relayers are untrusted couriers.</b> They can’t forge a valid proof.</div>
+   <div class="ln" id="l3">🔒 <b>Lock and mint.</b> Tokens lock on the source and appear as vouchers on the destination.</div>
+   <div class="ln" id="l4">🧱 <b>Security comes from the chains’ own validators,</b> not a third-party bridge.</div>
+  </div>
+  <div class="big" id="bg">Verify, don’t trust.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#a8d8ff':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+/* validators orbiting planets */
+const VA=[],VB=[],AX=62,BX=262,CY=200;
+for(let i=0;i<8;i++){VA.push({ph:i/8*Math.PI*2,e:mk('circle',{r:3.2,fill:'#7ad8ff',opacity:0},$('#vA')),x:0,y:0});VB.push({ph:i/8*Math.PI*2,e:mk('circle',{r:3.2,fill:'#c9a8ff',opacity:0},$('#vB')),x:0,y:0})}
+let vis=false,sign=0,t0=performance.now(),parts=[],beams=[];
+function frame(now){const t=(now-t0)/1000;
+ VA.forEach((v,i)=>{const a=v.ph+t*.6;v.x=AX+54*Math.cos(a);v.y=CY+54*Math.sin(a)*.72;v.e.setAttribute('cx',v.x);v.e.setAttribute('cy',v.y);v.e.setAttribute('opacity',vis?1:0);v.e.setAttribute('fill',i<sign?'#39ff88':'#7ad8ff');v.e.setAttribute('r',i<sign?4.2:3.2)});
+ VB.forEach(v=>{const a=v.ph-t*.6;v.x=BX+54*Math.cos(a);v.y=CY+54*Math.sin(a)*.72;v.e.setAttribute('cx',v.x);v.e.setAttribute('cy',v.y);v.e.setAttribute('opacity',vis?1:0)});
+ beams=beams.filter(b=>{const p=(now-b.s)/b.d;if(p>=1){b.l.remove();return false}const A=b.a;b.l.setAttribute('x1',A.x);b.l.setAttribute('y1',A.y);b.l.setAttribute('x2',b.tx);b.l.setAttribute('y2',b.ty);b.l.setAttribute('opacity',Math.sin(Math.PI*p)*.9);return true});
+ parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.l-=p.dc;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function spark(x,y,c,n=10,sp=2.4,g=.03){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g,l:1,dc:.028,e:mk('circle',{r:1.2+Math.random()*2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+function beam(from,tx,ty,col,ms){const l=mk('line',{stroke:col,'stroke-width':1.4,opacity:0,filter:'url(#gw)'},$('#bm'));beams.push({a:from,tx,ty,s:performance.now(),d:ms,l})}
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const s=performance.now();(function f(t){const p=Math.min(1,(t-s)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(s)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+function status(a,b,c){$('#stx').textContent=a;$('#stx').setAttribute('fill',c||'#39ff88');$('#stx2').textContent=b||''}
+/* objects */
+function packet(label,col){const g=mk('g',{opacity:0},$('#obj'));mk('rect',{x:-26,y:-9,width:52,height:18,rx:5,fill:col,filter:'url(#gw)'},g);const t=mk('text',{y:3.5,fill:'#04122a','font-size':8,'font-weight':700,'text-anchor':'middle'},g);t.textContent=label;
+ const m=mk('g',{transform:'translate(0 17)'},g);mk('path',{d:'M0 -5L-8 4M0 -5L8 4M-8 4H8',stroke:'#ffd23f','stroke-width':1.2,fill:'none'},m);[[0,-5],[-8,4],[8,4]].forEach(([x,y])=>mk('circle',{cx:x,cy:y,r:2.2,fill:'#ffd23f'},m));
+ const o={g,x:0,y:0,t,set(x,y,op){o.x=x;o.y=y;g.setAttribute('transform',`translate(${x} ${y})`);if(op!==undefined)g.setAttribute('opacity',op)}};return o}
+function arc(o,x1,y1,ms,lift){const x0=o.x,y0=o.y,mx=(x0+x1)/2,my=Math.min(y0,y1)-lift;return tween(0,1,ms,p=>{const q=1-p;o.set(q*q*x0+2*q*p*mx+p*p*x1,q*q*y0+2*q*p*my+p*p*y1)},eio)}
+function ship(){const g=mk('g',{opacity:0},$('#obj'));mk('polygon',{points:'0,-9 7,7 0,3 -7,7',fill:'#ffd23f',filter:'url(#gw)'},g);const o={g,x:0,y:0,set(x,y,op,rot){o.x=x;o.y=y;g.setAttribute('transform',`translate(${x} ${y}) rotate(${rot||90})`);if(op!==undefined)g.setAttribute('opacity',op)}};return o}
+function setLA(v){$('#la').textContent=v+' TOKEN'}function setMB(v){$('#mb').textContent=v+' ibc/TOKEN'}
+function gate(id,col){$(id).setAttribute('stroke',col)}
+function reset(){vis=false;sign=0;$('#obj').innerHTML='';['#gA','#gB','#rl','#stamp'].forEach(s=>$(s).classList.remove('on'));setLA(0);setMB(0);status('');gate('#gBc','#9b6bff');gate('#gAc','#29d9ff');$('#bg').classList.remove('on')}
+async function relay(label,col,bad){
+ const pk=packet(label,col);pk.set(98,196,1);const sh=ship();sh.set(98,160,1,90);spark(98,196,col,10,1.8);
+ $('#rl').classList.add('on');
+ await Promise.all([arc(pk,206,196,1700,38),arc(sh,206,152,1700,40)]);
+ gate('#gBc','#ffd23f');await sleep(500);
+ /* verification */
+ sign=0;for(let i=0;i<8;i++){if(i<6){sign=i+1;beam(VA[i],206,200,'#39ff88',700)}await sleep(130)}
+ await sleep(500);
+ if(bad){gate('#gBc','#ff3b4e');spark(206,200,'#ff3b4e',30,3.4);stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),800);
+  $('#stamp').classList.add('on');status('✘ Merkle proof does not match chain A’s state root','Packet rejected. The relayer’s tampering changed nothing.','#ff3b4e');
+  pk.g.setAttribute('opacity',.3);await sleep(300);return pk}
+ gate('#gBc','#39ff88');spark(206,200,'#39ff88',22,2.8);status('✔ header signed by 2/3 of A’s validators','✔ Merkle proof matches the state root','#39ff88');await sleep(1100);
+ await arc(pk,262,200,800,10);spark(262,200,'#c9a8ff',24,3);return pk}
+async function main(){
+ reset();scene('s1');note('Every blockchain is its own sovereign network. To exchange messages, they need a way to trust each other without trusting a middleman.');await sleep(900);vis=true;await sleep(2800);
+ note('Each chain runs a light client of the other: a compact verifier that tracks the other chain’s validator signatures.','warn');$('#gA').classList.add('on');$('#gB').classList.add('on');await sleep(3400);
+ note('A user on chain A wants to send 10 TOKEN to chain B. The tokens lock on A, and A stores a commitment to the packet.','warn');
+ await tween(0,10,900,v=>setLA(Math.round(v)));spark(62,200,'#29d9ff',16,2.2);await sleep(2200);
+ note('A relayer picks up the packet, with a Merkle proof and A’s latest signed header, and carries it to chain B. The relayer is not trusted.','warn');
+ const pk=await relay('10 TOKEN','#ffd23f',false);
+ note('B’s light client checks that 2/3 of A’s validators signed the header and that the proof matches. Verified, so B mints a voucher.','good');
+ await tween(0,10,800,v=>setMB(Math.round(v)));pk.g.setAttribute('opacity',0);await sleep(1800);
+ note('An acknowledgment flows back the same way, so chain A knows the transfer is complete.','good');
+ const ak=packet('ack ✔','#39ff88');ak.set(262,236,1);await arc(ak,62,236,1500,-24);ak.g.setAttribute('opacity',0);spark(62,236,'#39ff88',14,2);sign=0;status('✔ transfer complete','','#39ff88');await sleep(2200);
+ /* malicious relayer */
+ status('');$('#obj').innerHTML='';note('Now a malicious relayer tries to cheat: it edits the packet from 10 TOKEN to 1,000 TOKEN.','bad');await sleep(2600);
+ const pk2=await relay('1000 TOKEN','#ff3b4e',true);
+ note('The proof no longer matches chain A’s state root, so B’s light client rejects it. A courier can’t forge what the validators never signed.','good');await sleep(4200);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>

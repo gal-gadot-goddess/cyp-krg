@@ -160,5 +160,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 40 · Crypto Token Vesting Schedule_ Unlock Cliff, Sell Pressure and Circulating Supply (Melting Ice Explainer Reel).html",
+    "title": "Crypto Token Vesting Schedule · Unlock Cliff, Sell Pressure and Circulating Supply (Melting Ice Explainer Reel): What Actually Happens? ⚡",
+    "video": "VIZ 40 · Crypto Token Vesting Schedule_ Unlock Cliff, Sell Pressure and Circulating Supply (Melting Ice Explainer Reel).mp4",
+    "timestamp": "2026-10-29T15:44:53Z",
+    "publish": {
+      "instagram": {
+        "id": "18118811156091865",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "28561112896904264",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]

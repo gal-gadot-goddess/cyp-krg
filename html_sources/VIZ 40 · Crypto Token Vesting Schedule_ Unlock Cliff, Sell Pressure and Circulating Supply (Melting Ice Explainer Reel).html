@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Crypto Token Vesting Schedule · Unlock Cliff, Sell Pressure and Circulating Supply (Melting Ice Explainer Reel)</title>
+<style>
+:root{--bg:#030610;--c:#29d9ff;--v:#9b6bff;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#e8eef8;--d:#7f93b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;left:-90px;top:120px;background:#0b4a9a}
+.b2{width:250px;height:250px;right:-100px;top:330px;background:#0b7a8a;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#4a1b9a;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:33px;line-height:1.06;margin:150px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--o),var(--r));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(255,59,78,.8))}
+.sub{color:#b4c4e0;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #1d3458;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(6,12,28,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,46,6,.86);color:#ffe9a8}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #1d3458;background:rgba(6,12,28,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+.big{margin-top:20px;font-size:23px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--c),var(--v));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.fd{opacity:0;transition:opacity .4s}.fd.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>Locked today.<br>Dumped<br><em>tomorrow?</em></h1>
+  <div class="sub">Token vesting and unlock cliffs: how scheduled supply releases can move prices.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>Vesting and unlock cliffs</h2>
+  <svg viewBox="0 0 324 440" width="324" height="440">
+   <defs>
+    <linearGradient id="ic" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6f6ff"/><stop offset=".5" stop-color="#5ab8ff"/><stop offset="1" stop-color="#1a4aaa"/></linearGradient>
+    <linearGradient id="ic2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe0d0"/><stop offset=".5" stop-color="#ff9d6a"/><stop offset="1" stop-color="#a02a1a"/></linearGradient>
+    <linearGradient id="wt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#29d9ff"/><stop offset="1" stop-color="#5a3cff"/></linearGradient>
+    <linearGradient id="af" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#29d9ff" stop-opacity=".35"/><stop offset="1" stop-color="#29d9ff" stop-opacity="0"/></linearGradient>
+    <clipPath id="tk"><rect x="232" y="120" width="74" height="130" rx="8"/></clipPath>
+    <filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   </defs>
+   <text x="10" y="16" fill="#7f93b0" font-size="7.5" letter-spacing="1">TOKEN PRICE (LAUNCH = 1.00)</text>
+   <text id="pr" x="314" y="18" fill="#29d9ff" font-size="12" font-weight="700" text-anchor="end">1.00</text>
+   <rect x="10" y="24" width="304" height="76" rx="8" fill="rgba(6,12,28,.7)" stroke="#16264a"/>
+   <path d="M10 62H314" stroke="#16264a" stroke-dasharray="2 4"/>
+   <path id="car" fill="url(#af)"/><path id="cln" fill="none" stroke="#29d9ff" stroke-width="2.2" stroke-linejoin="round" filter="url(#gw)"/>
+   <circle id="chd" cx="10" cy="62" r="3.5" fill="#fff" filter="url(#gw)"/>
+   <text id="clf" class="fd" x="0" y="0" fill="#ff3b4e" font-size="8" font-weight="700" text-anchor="middle">CLIFF</text>
+   <g id="cols"></g>
+   <rect x="232" y="120" width="74" height="130" rx="8" fill="rgba(6,12,28,.8)" stroke="#2e4a8a" stroke-width="1.6"/>
+   <g clip-path="url(#tk)"><path id="wv" fill="url(#wt)" opacity=".9"/></g>
+   <text id="tl" x="269" y="112" fill="#8ad8ff" font-size="7" text-anchor="middle" letter-spacing="1">CIRCULATING SUPPLY</text>
+   <text id="tp" x="269" y="190" fill="#fff" font-size="16" font-weight="700" text-anchor="middle" style="paint-order:stroke;stroke:#030610;stroke-width:3px">5%</text>
+   <g id="drops"></g><g id="parts"></g>
+   <text id="cd" class="fd" x="106" y="110" fill="#ff3b4e" font-size="9" font-weight="700" text-anchor="middle">⚠ CLIFF IN 1 MONTH</text>
+   <rect x="6" y="294" width="96" height="50" rx="10" fill="rgba(6,12,28,.88)" stroke="#1d3458"/>
+   <text x="16" y="308" fill="#7f93b0" font-size="7" letter-spacing="1">MONTH</text><text id="mo" x="16" y="333" fill="#ffd23f" font-size="20" font-weight="700">0</text>
+   <rect x="108" y="294" width="104" height="50" rx="10" fill="rgba(6,12,28,.88)" stroke="#1d3458"/>
+   <text x="118" y="308" fill="#7f93b0" font-size="7" letter-spacing="1">CIRCULATING</text><text id="ci" x="118" y="333" fill="#29d9ff" font-size="20" font-weight="700">5%</text>
+   <rect x="218" y="294" width="100" height="50" rx="10" fill="rgba(6,12,28,.88)" stroke="#1d3458"/>
+   <text x="228" y="308" fill="#7f93b0" font-size="7" letter-spacing="1">UNLOCKED THIS MONTH</text><text id="um" x="228" y="333" fill="#ff9d3d" font-size="20" font-weight="700">0.0%</text>
+   <text id="stx" x="162" y="372" fill="#39ff88" font-size="10" font-weight="700" text-anchor="middle"></text>
+   <g id="stamp" class="fd"><text x="162" y="148" fill="#ff3b4e" font-size="22" font-weight="900" text-anchor="middle" transform="rotate(-6 162 142)" style="paint-order:stroke;stroke:#030610;stroke-width:5px">UNLOCK CLIFF</text></g>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">Reading unlock schedules</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🧊 <b>Locked tokens</b> aren’t circulating, but they will be.</div>
+   <div class="ln" id="l2">🗓 <b>Cliffs</b> release a big batch at once and can shock the price.</div>
+   <div class="ln" id="l3">💧 <b>Linear vesting</b> drips supply out and is easier to absorb.</div>
+   <div class="ln" id="l4">🔎 <b>Check the unlock calendar</b> before you buy any token.</div>
+  </div>
+  <div class="big" id="bg">Supply has a schedule.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#a8d8ff':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+/* ---------- schedules (percent of total supply) ---------- */
+const CAT=[
+ {n:'COMMUNITY',alloc:30,x:34,s:m=>5+25*Math.min(1,m/36)},
+ {n:'ECOSYSTEM',alloc:32,x:82,s:m=>m<6?0:32*Math.min(1,(m-6)/42)},
+ {n:'TEAM',alloc:20,x:130,s:m=>m<12?0:20*(.25+.75*Math.min(1,(m-12)/24))},
+ {n:'INVESTORS',alloc:18,x:178,s:m=>m<12?0:18*(.25+.75*Math.min(1,(m-12)/24))}];
+const BASE=250,PXP=4;
+CAT.forEach((c,i)=>{const g=mk('g',{},$('#cols'));
+ c.h=(c.alloc-c.s(0))*PXP;c.r=mk('rect',{x:c.x-18,y:BASE-c.h,width:36,height:c.h,rx:5,fill:i>=2?'url(#ic2)':'url(#ic)',opacity:.92,filter:'url(#gw)'},g);
+ c.sh=mk('rect',{x:c.x-14,y:BASE-c.h+3,width:6,height:Math.max(0,c.h-6),rx:3,fill:'#fff',opacity:.35},g);
+ mk('text',{x:c.x,y:262,fill:i>=2?'#ffb89a':'#8ad8ff','font-size':6,'text-anchor':'middle','letter-spacing':.5},g).textContent=c.n;
+ mk('text',{x:c.x,y:271,fill:'#7f93b0','font-size':6,'text-anchor':'middle'},g).textContent=c.alloc+'%';
+ c.prev=c.s(0);c.lastDelta=0});
+const circ=m=>CAT.reduce((a,c)=>a+c.s(m),0);
+let m=0,mspeed=0,cur=5,hist=[1],P=1,lastMo=0,parts=[],drops=[],last=performance.now(),tt=0,cliffDone=false,shown=true,uTotal=0,uMonth=0;
+const CH={x0:10,x1:314,y0:98,y1:30};
+function chart(){const n=Math.min(48,hist.length),pts=hist.map((v,i)=>[CH.x0+(CH.x1-CH.x0)*i/48,CH.y0-(Math.min(1.2,Math.max(.3,v))-.3)/.9*(CH.y0-CH.y1)]),d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join('');
+ $('#cln').setAttribute('d',d);const lp=pts[pts.length-1];$('#car').setAttribute('d',d+'L'+lp[0].toFixed(1)+' '+CH.y0+'L'+CH.x0+' '+CH.y0+'Z');$('#chd').setAttribute('cx',lp[0]);$('#chd').setAttribute('cy',lp[1]);$('#pr').textContent=P.toFixed(2);$('#pr').setAttribute('fill',P<.85?'#ff3b4e':'#29d9ff')}
+function spark(x,y,c,n=8,sp=2.2,g=.04){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g,l:1,dc:.028,e:mk('circle',{r:1.2+Math.random()*2.2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+function drop(x,y,col){const e=mk('circle',{r:2.4,fill:col,filter:'url(#gw)'},$('#drops'));drops.push({x0:x,y0:y,x1:262+Math.random()*14,y1:Math.max(120,250-cur*1.3),s:performance.now(),d:600+Math.random()*300,e,arc:20+Math.random()*30})}
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;
+ if(mspeed>0&&m<48){m=Math.min(48,m+mspeed*dt)}
+ /* months boundary: price model */
+ while(lastMo<Math.floor(m)){lastMo++;const c0=circ(lastMo-1),c1=circ(lastMo),d=c1-c0,ratio=d/Math.max(2,c0);P=P*1.07*Math.exp(-.7*ratio);hist.push(P);uMonth=d;
+  $('#um').textContent=d.toFixed(1)+'%';$('#um').setAttribute('fill',d>5?'#ff3b4e':'#ff9d3d');chart()}
+ /* ice columns */
+ let tot=0;
+ for(const c of CAT){const u=c.s(m),locked=c.alloc-u,tgtH=Math.max(0,locked*PXP);c.h+=(tgtH-c.h)*.14;
+  c.r.setAttribute('y',BASE-c.h);c.r.setAttribute('height',Math.max(0,c.h));c.sh.setAttribute('y',BASE-c.h+3);c.sh.setAttribute('height',Math.max(0,c.h-6));
+  const du=u-c.prev;c.prev=u;tot+=u;
+  if(du>1.2){/* cliff chunk */for(let k=0;k<26;k++)spark(c.x+(Math.random()-.5)*30,BASE-c.h-Math.random()*50,'#bfefff',1,3.2,.08);for(let k=0;k<14;k++)drop(c.x+(Math.random()-.5)*30,BASE-c.h,'#29d9ff');
+   if(!cliffDone){cliffDone=true;stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),900);$('#stamp').classList.add('on');setTimeout(()=>$('#stamp').classList.remove('on'),2600)}}
+  else if(du>0&&c.h>1&&Math.random()<Math.min(.9,du*dt*0+du*60))drop(c.x+(Math.random()-.5)*26,BASE-c.h,'#29d9ff')}
+ cur+=(tot-cur)*.1;const cv=cur;
+ /* tank wave */
+ const ty=250-cv*1.3;let d='M232 '+ty;for(let x=232;x<=306;x+=6)d+='L'+x+' '+(ty+2.2*Math.sin(x*.12+tt*3)).toFixed(1);d+='L306 252L232 252Z';$('#wv').setAttribute('d',d);
+ $('#tp').textContent=Math.round(cv)+'%';$('#tp').setAttribute('y',Math.min(238,Math.max(140,ty+22)));$('#ci').textContent=Math.round(cv)+'%';$('#mo').textContent=Math.floor(m);
+ /* price glide point */
+ drops=drops.filter(o=>{const p=(now-o.s)/o.d;if(p>=1){o.e.remove();return false}const q=1-p,mx=(o.x0+o.x1)/2,my=Math.min(o.y0,o.y1)-o.arc;o.e.setAttribute('cx',q*q*o.x0+2*q*p*mx+p*p*o.x1);o.e.setAttribute('cy',q*q*o.y0+2*q*p*my+p*p*o.y1);return true});
+ parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.l-=p.dc;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+function status(t,c){$('#stx').textContent=t;$('#stx').setAttribute('fill',c||'#39ff88')}
+function reset(){m=0;mspeed=0;lastMo=0;P=1;hist=[1];cliffDone=false;CAT.forEach(c=>{c.prev=c.s(0);c.h=(c.alloc-c.s(0))*PXP});cur=5;uMonth=0;chart();$('#um').textContent='0.0%';$('#um').setAttribute('fill','#ff9d3d');status('');
+ ['#cd','#clf','#stamp'].forEach(s=>$(s).classList.remove('on'));$('#bg').classList.remove('on')}
+const until=t=>new Promise(res=>{const f=()=>m>=t?res():setTimeout(f,40);f()});
+async function main(){
+ reset();scene('s1');note('Most crypto projects lock tokens for the team, investors and ecosystem, then release them on a schedule. Only a small slice circulates at launch.');await sleep(4200);
+ note('Time starts. Community and ecosystem tokens unlock steadily, a little every month. The market absorbs small drips.','warn');mspeed=.9;await until(6);
+ mspeed=1.3;status('linear vesting: small monthly drips','#8ad8ff');await until(10);
+ note('Month 12 is coming: the team and investor cliff. After a year of waiting, a big batch unlocks at once.','bad');mspeed=.45;status('');
+ await until(11.05);$('#cd').setAttribute('x',150);$('#cd').classList.add('on');await until(11.99);mspeed=0;m=11.99;await sleep(1300);
+ mspeed=1;await until(12.4);$('#cd').classList.remove('on');mspeed=0;
+ const cx=hist.length-1,px=CH.x0+(CH.x1-CH.x0)*cx/48;$('#clf').setAttribute('x',px);$('#clf').setAttribute('y',CH.y0-24);$('#clf').classList.add('on');
+ note('The cliff hits: 9.5% of the total supply unlocks overnight, about half of what was already circulating. The price takes a hit of nearly 30%.','bad');await sleep(4600);
+ note('After the cliff, team and investor tokens keep unlocking every month, an ongoing supply overhang.','warn');mspeed=3.2;await until(36);
+ mspeed=3;note('By month 36 the team and investors are fully unlocked. Ecosystem tokens keep releasing until month 48.');await until(48);mspeed=0;
+ status('✔ 100% circulating: the schedule is complete','#39ff88');note('Projects smooth this with longer vesting, staggered cliffs and transparent calendars. Always check the unlocks.','good');await sleep(4200);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>
