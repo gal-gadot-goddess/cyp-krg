@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>DeFi Stablecoin CDP Vault · Collateral Ratio Gauge, Liquidation and Dutch Auction (Speedometer Explainer Reel)</title>
+<style>
+:root{--bg:#04030c;--c:#29d9ff;--v:#9b6bff;--m:#ff5fd2;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#ece8f8;--d:#8f86b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px}
+.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;left:-90px;top:30px;background:#3a1b9a}
+.b2{width:250px;height:250px;right:-100px;top:330px;background:#0b6a5a;animation-duration:18s}
+.b3{width:200px;height:200px;left:90px;bottom:-60px;background:#7a1b6a;animation-duration:16s}
+@keyframes drift{to{transform:translate(40px,-50px) scale(1.25)}}
+#stars{position:absolute;inset:0;pointer-events:none}
+#stars circle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.12}50%{opacity:.85}}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:2}
+.sc.on{opacity:1}
+h1{font-size:32px;line-height:1.06;margin:145px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--c),var(--g));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(57,255,136,.7))}
+.sub{color:#bdb3dc;font-size:14px;line-height:1.5}
+h2{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+#note{min-height:48px;margin-top:2px;padding:11px 12px;border:1px solid #2e2460;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(12,8,30,.84);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.86);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.86);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,46,6,.86);color:#ffe9a8}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #2e2460;background:rgba(12,8,30,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--c)}
+.big{margin-top:20px;font-size:23px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--c),var(--g));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+svg text{font-family:inherit}
+.fd{opacity:0;transition:opacity .4s}.fd.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+ <svg id="stars" viewBox="0 0 360 640"></svg>
+
+ <section class="sc" id="s0">
+  <h1>Mint money<br>against<br><em>your collateral.</em></h1>
+  <div class="sub">Stablecoin vaults (CDPs): how overcollateralized debt creates a decentralized dollar, and what happens when collateral falls.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>Stablecoin vaults and liquidation</h2>
+  <svg viewBox="0 0 324 440" width="324" height="440">
+   <defs><filter id="gw" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+   <g id="gz" fill="none" stroke-width="13" stroke-linecap="butt"></g>
+   <g id="tk" fill="#8f86b0" font-size="7" text-anchor="middle"></g>
+   <line id="nd" x1="162" y1="168" x2="162" y2="80" stroke="#fff" stroke-width="3" stroke-linecap="round" filter="url(#gw)"/>
+   <circle id="nt" cx="162" cy="80" r="4.5" fill="#fff" filter="url(#gw)"/>
+   <circle cx="162" cy="168" r="10" fill="#14102e" stroke="#9b6bff" stroke-width="2"/>
+   <text id="rt" x="162" y="128" fill="#39ff88" font-size="26" font-weight="700" text-anchor="middle" style="filter:drop-shadow(0 0 8px currentColor)">—</text>
+   <text x="162" y="143" fill="#8f86b0" font-size="7" text-anchor="middle" letter-spacing="1.2">COLLATERAL RATIO</text>
+   <text x="46" y="188" fill="#ff3b4e" font-size="6.5" text-anchor="middle">LIQUIDATED</text><text x="162" y="40" fill="#ffd23f" font-size="7" text-anchor="middle" opacity=".0">min</text>
+   <rect x="6" y="200" width="152" height="54" rx="12" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text x="16" y="214" fill="#8f86b0" font-size="7" letter-spacing="1">VAULT #1 · COLLATERAL</text><text id="cl" x="16" y="232" fill="#b79bff" font-size="14" font-weight="700">0 ETH</text>
+   <text x="16" y="247" fill="#8f86b0" font-size="7" letter-spacing="1">DEBT</text><text id="db" x="46" y="247" fill="#39ff88" font-size="9" font-weight="700">0 USDx</text>
+   <rect x="166" y="200" width="152" height="54" rx="12" fill="rgba(12,8,30,.88)" stroke="#2e2460"/>
+   <text x="176" y="214" fill="#8f86b0" font-size="7" letter-spacing="1">ETH PRICE</text><text id="px" x="176" y="236" fill="#29d9ff" font-size="18" font-weight="700">$2,000</text>
+   <path id="sp" fill="none" stroke="#29d9ff" stroke-width="1.6" opacity=".8"/>
+   <g id="stn">
+    <text x="40" y="288" font-size="22" text-anchor="middle">🧑</text><text x="40" y="304" fill="#8f86b0" font-size="7" text-anchor="middle" letter-spacing="1">ALICE</text>
+    <circle id="vg" cx="162" cy="282" r="26" fill="#9b6bff" opacity=".18" filter="url(#gw)"/><text x="162" y="290" font-size="24" text-anchor="middle">🏦</text><text x="162" y="304" fill="#8f86b0" font-size="7" text-anchor="middle" letter-spacing="1">VAULT</text>
+    <g id="kp" class="fd"><text x="284" y="288" font-size="22" text-anchor="middle">🤖</text><text x="284" y="304" fill="#8f86b0" font-size="7" text-anchor="middle" letter-spacing="1">KEEPERS</text></g>
+   </g>
+   <g id="au" class="fd"><rect x="6" y="318" width="312" height="56" rx="12" fill="rgba(40,10,16,.9)" stroke="#ff3b4e"/>
+    <text x="16" y="333" fill="#ff8a97" font-size="7.5" letter-spacing="1">🔨 DUTCH AUCTION · PRICE PER ETH FALLS UNTIL A KEEPER BUYS</text>
+    <rect x="16" y="342" width="292" height="10" rx="5" fill="#2a0a12"/><rect id="ab" x="16" y="342" width="292" height="10" rx="5" fill="#ff9d3d" filter="url(#gw)"/>
+    <text id="at" x="16" y="368" fill="#ffe9a8" font-size="9" font-weight="700"></text></g>
+   <g id="parts"></g>
+   <text id="stx" x="162" y="396" fill="#39ff88" font-size="10" font-weight="700" text-anchor="middle"></text>
+   <text id="stx2" x="162" y="411" fill="#8f86b0" font-size="8" text-anchor="middle"></text>
+   <g id="stamp" class="fd"><text id="stt" x="162" y="186" fill="#ff3b4e" font-size="24" font-weight="900" text-anchor="middle" transform="rotate(-6 162 180)" style="paint-order:stroke;stroke:#04030c;stroke-width:5px">LIQUIDATION</text></g>
+  </svg>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">Why vaults hold up</h2>
+  <div class="lines">
+   <div class="ln" id="l1">🏦 <b>Overcollateralized.</b> Every stablecoin is backed by more value than it’s worth.</div>
+   <div class="ln" id="l2">📉 <b>Liquidation.</b> Below the minimum ratio, collateral is sold to repay the debt.</div>
+   <div class="ln" id="l3">🔨 <b>Auctions</b> turn collateral into stablecoins to cover the loss.</div>
+   <div class="ln" id="l4">⚠ <b>Risks:</b> violent crashes, congested chains and bad oracles.</div>
+  </div>
+  <div class="big" id="bg">Backed before it’s minted.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+for(let i=0;i<70;i++){const c=mk('circle',{cx:Math.random()*360,cy:Math.random()*640,r:Math.random()*1.2+.3,fill:Math.random()<.3?'#d9b8ff':'#cfe6ff'},$('#stars'));c.style.animationDelay=(-Math.random()*3)+'s';c.style.animationDuration=(2+Math.random()*3)+'s'}
+
+/* ---------- gauge ---------- */
+const GX=162,GY=168,GR=96,ang=r=>Math.PI*(1-(Math.max(100,Math.min(300,r))-100)/200);
+const pt=(r,a)=>[GX+r*Math.cos(a),GY-r*Math.sin(a)];
+function arc(r0,r1,col,op=1){const a0=ang(r0),a1=ang(r1),[x0,y0]=pt(GR,a0),[x1,y1]=pt(GR,a1);mk('path',{d:`M${x0.toFixed(1)} ${y0.toFixed(1)}A${GR} ${GR} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`,stroke:col,opacity:op},$('#gz'))}
+arc(100,150,'#ff3b4e');arc(150,200,'#ffb020');arc(200,300,'#39ff88');
+[100,150,200,250,300].forEach(v=>{const a=ang(v),[x,y]=pt(GR+16,a),[xa,ya]=pt(GR-9,a),[xb,yb]=pt(GR+8,a);mk('line',{x1:xa,y1:ya,x2:xb,y2:yb,stroke:'#fff','stroke-width':1,opacity:.6},$('#tk'));mk('text',{x,y:y+2.5},$('#tk')).textContent=v+'%'});
+mk('text',{x:pt(GR+16,ang(150))[0]-4,y:pt(GR+16,ang(150))[1]-9,fill:'#ff8a97','font-size':6.5,'text-anchor':'middle'},$('#tk')).textContent='MIN';
+let ratio=0,shown=ratio;
+function setNeedle(r){const a=ang(r),[x,y]=pt(GR-6,a);$('#nd').setAttribute('x2',x);$('#nd').setAttribute('y2',y);$('#nt').setAttribute('cx',x);$('#nt').setAttribute('cy',y);
+ const col=r<150?'#ff3b4e':r<200?'#ffb020':'#39ff88';$('#rt').textContent=Math.round(r)+'%';$('#rt').setAttribute('fill',col);$('#rt').style.color=col;$('#nd').setAttribute('stroke',col);$('#nt').setAttribute('fill',col)}
+
+/* ---------- state ---------- */
+let coll=0,debt=0,price=2000,spk=[2000],parts=[],last=performance.now();
+function recalc(){ratio=debt>0?coll*price/debt*100:0}
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const s=performance.now();(function f(t){const p=Math.min(1,(t-s)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(s)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+const fm=v=>'$'+Math.round(v).toLocaleString('en-US');
+function spark(x,y,c,n=10,sp=2.4,g=.03){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=(.4+Math.random())*sp;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g,l:1,dc:.028,e:mk('circle',{r:1.2+Math.random()*2,fill:c,filter:'url(#gw)'},$('#parts'))})}}
+function frame(){recalc();shown+=(ratio-shown)*.15;if(debt>0)setNeedle(shown);else{shown=ratio;$('#rt').textContent='—'}
+ $('#cl').textContent=(Math.round(coll*100)/100)+' ETH';$('#db').textContent=Math.round(debt).toLocaleString('en-US')+' USDx';$('#px').textContent=fm(price);
+ $('#vg').setAttribute('opacity',(.12+Math.min(.5,coll/16)).toFixed(2));
+ parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.l-=p.dc;if(p.l<=0){p.e.remove();return false}p.e.setAttribute('cx',p.x);p.e.setAttribute('cy',p.y);p.e.setAttribute('opacity',p.l);return true});
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+function drawSpark(){const mn=Math.min(...spk),mx=Math.max(...spk),rg=Math.max(1,mx-mn),d=spk.map((v,i)=>(i?'L':'M')+(176+i*(132/Math.max(1,spk.length-1))).toFixed(1)+' '+(250-(v-mn)/rg*20).toFixed(1)).join('');$('#sp').setAttribute('d',spk.length>1?d:'')}
+function coin(x0,y0,x1,y1,col,ms,r=4,arcH=-30){const c=mk('circle',{r,fill:col,filter:'url(#gw)'},$('#parts')),mx=(x0+x1)/2,my=(y0+y1)/2+arcH;
+ return tween(0,1,ms,p=>{const q=1-p,x=q*q*x0+2*q*p*mx+p*p*x1,y=q*q*y0+2*q*p*my+p*p*y1;c.setAttribute('cx',x);c.setAttribute('cy',y)},eio).then(()=>{c.remove();spark(x1,y1,col,4,1.4)})}
+async function stream(n,x0,y0,x1,y1,col,ms=700,gap=70){const a=[];for(let i=0;i<n;i++)a.push(sleep(i*gap).then(()=>coin(x0,y0,x1,y1,col,ms)));await Promise.all(a)}
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
+function status(a,b,c){$('#stx').textContent=a;$('#stx').setAttribute('fill',c||'#39ff88');$('#stx2').textContent=b||''}
+function reset(){coll=0;debt=0;price=2000;spk=[2000];drawSpark();ratio=0;shown=0;['#au','#kp','#stamp'].forEach(s=>$(s).classList.remove('on'));status('');$('#bg').classList.remove('on');$('#ab').setAttribute('width',292);$('#at').textContent=''}
+async function main(){
+ reset();scene('s1');note('A stablecoin vault (CDP) lets you borrow stablecoins against crypto collateral. The vault always holds more value than the debt.');await sleep(3600);
+ note('Alice deposits 10 ETH, worth $20,000 at $2,000 each, into a vault.','warn');
+ const dp=stream(10,40,284,162,284,'#9b6bff',650,90);await tween(0,10,1100,v=>coll=v);await dp;spark(162,282,'#b79bff',20,2.6);await sleep(1400);
+ note('She mints 8,000 USDx, a dollar-pegged stablecoin. Collateral ratio: $20,000 ÷ $8,000 = 250%, comfortably safe.','good');
+ const ms=stream(12,162,284,40,284,'#39ff88',650,80);await tween(0,8000,1200,v=>debt=v,eio);await ms;status('✔ safe: 250% (minimum is 150%)','#39ff88');await sleep(3200);status('');
+ note('A small stability fee accrues over time, so the debt creeps up to about 8,040.','warn');await tween(8000,8040,1600,v=>debt=v);await sleep(1800);
+ note('Then ETH crashes. As the price falls, the ratio slides toward the minimum.','bad');
+ const pcs=[2000,1800,1600,1400,1250,1100];let k=0;
+ await tween(2000,1100,3600,v=>{price=v;if(Math.random()<.2){spk.push(v);drawSpark()}},eio);spk.push(1100);drawSpark();
+ stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),900);
+ $('#stt').textContent='LIQUIDATION';$('#stamp').classList.add('on');status('ratio 137% < 150% minimum: vault is liquidated','#ff3b4e');
+ note('At $1,100 the ratio falls to about 137%, below the 150% minimum. The vault is liquidated.','bad');await sleep(3200);$('#stamp').classList.remove('on');
+ /* auction */
+ $('#au').classList.add('on');$('#kp').classList.add('on');note('The collateral goes to a Dutch auction. The price per ETH starts high and falls until a keeper bot decides it’s a bargain.','warn');
+ const at=$('#at'),ab=$('#ab');let bought=false,pp=1210;
+ await tween(1210,1090,3200,v=>{pp=v;ab.setAttribute('width',292*(v-1000)/210);at.textContent='$'+Math.round(v)+' per ETH · waiting for a buyer…'},p=>p);
+ spark(284,284,'#ffd23f',20,2.6);at.textContent='✔ SOLD at $1,090 per ETH to a keeper';await sleep(1200);
+ note('A keeper buys 8.33 ETH at $1,090. The roughly $9,085 it pays covers the debt of $8,040 plus a 13% liquidation penalty.','good');
+ const eth=stream(9,162,284,284,284,'#9b6bff',700,90),rep=sleep(700).then(()=>stream(9,284,284,162,284,'#39ff88',700,90));
+ await Promise.all([eth,rep,tween(10,1.67,1500,v=>coll=v,eio),sleep(1000).then(()=>tween(8040,0,1200,v=>debt=v,eio))]);spark(162,282,'#ff9d3d',24,3);await sleep(700);
+ note('The debt is repaid and the stablecoins are burned. The leftover 1.67 ETH goes back to Alice.','good');
+ await stream(6,162,284,40,284,'#9b6bff',700,100);status('✔ stablecoin still fully backed','Alice keeps 1.67 ETH (about $1,820)','#39ff88');await sleep(3800);
+ scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>

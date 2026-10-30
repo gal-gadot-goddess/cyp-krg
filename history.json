@@ -183,5 +183,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "Concentrated Liquidity.html",
+    "title": "Uniswap v3 Concentrated Liquidity: Same ETH, More Fees 📈",
+    "video": "Concentrated Liquidity.mp4",
+    "timestamp": "2026-10-30T15:27:17Z",
+    "publish": {
+      "instagram": {
+        "id": "17915002650539351",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "2443583779712783",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]

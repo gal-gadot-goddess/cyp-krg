@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Bitcoin Mining Farm · ASIC Racks, Hashrate, Heat, Electricity and Halving Survival (Cinematic Walkthrough Explainer Reel)</title>
+<style>
+:root{--bg:#04050a;--c:#29d9ff;--g:#39ff88;--r:#ff3b4e;--o:#ff9d3d;--y:#ffd23f;--t:#e8eef8;--d:#7f93b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--t)}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:360px;height:640px;flex:none;background:var(--bg);overflow:hidden;border-radius:14px}
+#cv{position:absolute;inset:0;width:360px;height:640px;opacity:0;transition:opacity .8s}
+#cv.on{opacity:1}
+#vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(75% 60% at 50% 45%,transparent 45%,rgba(0,0,0,.78));z-index:3}
+#stage:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);pointer-events:none;z-index:9}
+#stage:after{content:"";position:absolute;inset:0;background:var(--r);opacity:0;pointer-events:none;z-index:8;mix-blend-mode:color}
+#stage.gl{animation:sh .12s linear 8}
+#stage.gl:after{opacity:.5}
+@keyframes sh{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-3px)}75%{transform:translate(-3px,-2px)}100%{transform:translate(0,0)}}
+.sc{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s;padding:24px 18px 0;z-index:4}
+.sc.on{opacity:1}
+#s0{background:radial-gradient(100% 70% at 50% 40%,#1a2438,#04050a 70%)}
+h1{font-size:33px;line-height:1.06;margin:150px 0 14px;letter-spacing:-.03em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--o),var(--y));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(255,157,61,.8))}
+.sub{color:#b4c4e0;font-size:14px;line-height:1.5}
+h2{font-size:17px;margin:0;letter-spacing:-.02em;text-shadow:0 0 12px #000,0 0 4px #000}
+.hud{position:absolute;left:12px;right:12px;bottom:112px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.bx{padding:7px 9px;border-radius:10px;background:rgba(6,10,20,.78);border:1px solid #1d3458;backdrop-filter:blur(4px)}
+.bx i{display:block;font-style:normal;font-size:7px;letter-spacing:.1em;color:var(--d)}
+.bx b{display:block;font-size:15px;margin-top:2px}
+#note{position:absolute;left:12px;right:12px;bottom:14px;min-height:48px;padding:11px 12px;border:1px solid #1d3458;border-radius:12px;font-size:12px;line-height:1.5;background:rgba(6,10,20,.86);backdrop-filter:blur(4px);transition:all .3s}
+#note.bad{border-color:var(--r);background:rgba(60,8,16,.88);color:#ffb3bb}
+#note.good{border-color:var(--g);background:rgba(6,40,22,.88);color:var(--g)}
+#note.warn{border-color:var(--y);background:rgba(60,46,6,.88);color:#ffe9a8}
+#cap{position:absolute;left:0;right:0;top:92px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.18em;color:#fff;text-shadow:0 0 12px #000;opacity:0;transition:opacity .4s}
+#cap.on{opacity:1}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.ln{padding:13px 12px;border-radius:12px;border:1px solid #1d3458;background:rgba(6,12,28,.86);font-size:13px;line-height:1.5;opacity:0;transform:translateX(-26px);transition:all .55s}
+.ln.on{opacity:1;transform:none}
+.ln b{color:var(--o)}
+.big{margin-top:20px;font-size:23px;font-weight:700;text-align:center;opacity:0;transition:opacity .8s;background:linear-gradient(90deg,var(--o),var(--y));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big.on{opacity:1}
+#s2{background:radial-gradient(100% 70% at 50% 40%,#1a2438,#04050a 70%)}
+</style>
+</head>
+<body>
+<div id="stage">
+ <canvas id="cv" width="360" height="640"></canvas>
+ <div id="vig"></div>
+
+ <section class="sc" id="s0">
+  <h1>Where Bitcoin<br>is <em>actually made.</em></h1>
+  <div class="sub">Inside a mining farm: ASIC racks, hashrate, electricity, heat, and who survives a halving.</div>
+ </section>
+
+ <section class="sc" id="s1">
+  <h2>Inside a Bitcoin mining farm</h2>
+  <div id="cap">THERMAL VIEW</div>
+  <div class="hud">
+   <div class="bx"><i>MACHINES ONLINE</i><b id="h1" style="color:#29d9ff">0</b></div>
+   <div class="bx"><i>HASHRATE</i><b id="h2" style="color:#ffd23f">0 EH/s</b></div>
+   <div class="bx"><i>POWER DRAW</i><b id="h3" style="color:#ff9d3d">0 MW</b></div>
+   <div class="bx"><i>EFFICIENCY</i><b id="h4" style="color:#39ff88">— J/TH</b></div>
+  </div>
+  <div id="note">…</div>
+ </section>
+
+ <section class="sc" id="s2">
+  <h2 style="margin-top:30px;font-size:24px">What decides who mines</h2>
+  <div class="lines">
+   <div class="ln" id="l1">⛏ <b>ASICs hash and nothing else.</b> Trillions of guesses per second each.</div>
+   <div class="ln" id="l2">⚡ <b>Electricity is the main cost.</b> Cheap power wins.</div>
+   <div class="ln" id="l3">🔥 <b>Almost all power becomes heat,</b> so cooling and climate matter.</div>
+   <div class="ln" id="l4">📉 <b>After a halving,</b> only the most efficient machines stay profitable.</div>
+  </div>
+  <div class="big" id="bg">Efficiency decides who survives.</div>
+ </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const stage=$('#stage');
+function fit(){stage.style.transform='scale('+Math.min(innerWidth/360,innerHeight/640)+')'}
+addEventListener('resize',fit);fit();
+const cv=$('#cv'),ctx=cv.getContext('2d'),W=360,H=640,VX=180,VY=280,F=250;
+/* ---------- world state ---------- */
+let cam=0,speed=0,fan=1,thermal=0,online=1,oldOff=0,rate=0,tt=0,last=performance.now();
+const SP=1,RL=.9,XW=.82,YT=-.78,YB=.92;
+const hash=(a,b)=>{let x=Math.imul(a*374761393+b*668265263,1274126177);x=(x^(x>>>13))>>>0;return x/4294967296};
+const P=(x,y,z)=>[VX+x*F/z,VY+y*F/z];
+function quad(a,b,c,d,fill){ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.lineTo(c[0],c[1]);ctx.lineTo(d[0],d[1]);ctx.closePath();ctx.fillStyle=fill;ctx.fill()}
+function shade(z,base){const k=Math.max(0,1-z/22);return `rgba(${base[0]*k|0},${base[1]*k|0},${base[2]*k|0},1)`}
+function rack(side,w,z0,z1,t){
+ const x=side*XW,a=P(x,YT,z0),b=P(x,YT,z1),c=P(x,YB,z1),d=P(x,YB,z0);
+ const old=hash(w,7)<.5,off=old&&oldOff>hash(w,11);const fall=Math.max(0,1-z0/22);
+ quad(a,b,c,d,shade(z0,[24,30,42]));
+ /* slots */
+ const rows=6;for(let r=0;r<rows;r++){const y0=YT+(YB-YT)*(r/rows)+.02,y1=YT+(YB-YT)*((r+1)/rows)-.02;
+  const s0=P(x,y0,z0),s1=P(x,y0,z1),s2=P(x,y1,z1),s3=P(x,y1,z0);
+  const th=thermal;let col=off?`rgba(${14*fall|0},${16*fall|0},${22*fall|0},1)`:
+   `rgba(${(30+th*190)*fall|0},${(38+th*50-th*10)*fall|0},${(52-th*30)*fall|0},1)`;
+  quad(s0,s1,s2,s3,col);
+  /* fan */
+  const cz=(z0+z1)/2,cy=(y0+y1)/2,c0=P(x,cy,cz),za=P(x,cy,z0+.18),zb=P(x,cy,z1-.18),ry=Math.abs(s3[1]-s0[1])*.36,rx=Math.max(1,Math.abs(zb[0]-za[0])*.5);
+  if(ry>1.4){ctx.save();ctx.translate(c0[0],c0[1]);ctx.scale(rx/ry,1);ctx.beginPath();ctx.arc(0,0,ry,0,Math.PI*2);ctx.fillStyle=`rgba(4,6,10,${fall})`;ctx.fill();
+   if(ry>3){ctx.strokeStyle=`rgba(150,170,200,${.55*fall})`;ctx.lineWidth=Math.max(.6,ry*.12);const ang=off?0:tt*fan*(8+hash(w,r)*3)+r;for(let k=0;k<4;k++){const aa=ang+k*Math.PI/2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(aa)*ry*.92,Math.sin(aa)*ry*.92);ctx.stroke()}ctx.beginPath();ctx.arc(0,0,ry*.95,0,Math.PI*2);ctx.stroke()}
+   ctx.restore()}
+  /* LED */
+  const lp=P(x,y0+(y1-y0)*.5,z0+.07),lr=Math.max(.6,ry*.18);
+  const blink=.5+.5*Math.sin(tt*6+w*3+r*1.7);const lc=off?'rgba(255,40,50,.9)':(thermal>.5?`rgba(255,${120+blink*80|0},40,${.9*fall})`:`rgba(57,255,136,${(.55+.45*blink)*fall})`);
+  ctx.beginPath();ctx.arc(lp[0],lp[1],lr,0,Math.PI*2);ctx.fillStyle=lc;ctx.fill();
+  if(lr>1.5&&fall>.2){ctx.beginPath();ctx.arc(lp[0],lp[1],lr*3,0,Math.PI*2);ctx.fillStyle=lc.replace(/[\d.]+\)$/,'0.12)');ctx.fill()}}
+ /* edge highlight */
+ ctx.strokeStyle=`rgba(120,150,200,${.25*fall})`;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(d[0],d[1]);ctx.stroke()
+}
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ /* background */
+ let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#05070d');g.addColorStop(.5,'#0b1220');g.addColorStop(1,'#04050a');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ const far=22;
+ /* floor */
+ const fa=P(-XW,YB,.3),fb=P(XW,YB,.3),fc=P(XW,YB,far),fd=P(-XW,YB,far);
+ g=ctx.createLinearGradient(0,VY,0,H);g.addColorStop(0,'#0c1424');g.addColorStop(1,'#1b2a40');quad(fa,fb,fc,fd,g);
+ for(let z=Math.ceil(cam)-cam+.3;z<far;z+=1){const a=P(-XW,YB,z),b=P(XW,YB,z);ctx.strokeStyle=`rgba(90,130,200,${.18*Math.max(0,1-z/far)})`;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
+ for(const x of[-.5,0,.5]){const a=P(x,YB,.3),b=P(x,YB,far);ctx.strokeStyle='rgba(90,130,200,.12)';ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
+ /* ceiling lights */
+ for(let k=0;k<30;k++){const z=(k*2)-((cam*1)%2)+.6;if(z<.3||z>far)continue;const a=P(-.12,-1.05,z),b=P(.12,-1.05,z),c=P(.12,-1.05,z+.5),d=P(-.12,-1.05,z+.5);quad(a,b,c,d,`rgba(210,230,255,${.9*(1-z/far)})`);
+  const gp=P(0,-1.05,z+.25);const gr=ctx.createRadialGradient(gp[0],gp[1],0,gp[0],gp[1],70/z);gr.addColorStop(0,`rgba(180,210,255,${.22*(1-z/far)})`);gr.addColorStop(1,'rgba(180,210,255,0)');ctx.fillStyle=gr;ctx.fillRect(gp[0]-90,gp[1]-90,180,180)}
+ /* racks far -> near */
+ const base=Math.floor(cam);
+ for(let i=34;i>=0;i--){const w=base+i,z0=w-cam+.35,z1=z0+RL;if(z1<.3||z0>far)continue;rack(-1,w,Math.max(.3,z0),z1,tt);rack(1,w+1000,Math.max(.3,z0),z1,tt)}
+ /* end wall glow + haze */
+ let hg=ctx.createRadialGradient(VX,VY,0,VX,VY,120);hg.addColorStop(0,'rgba(255,200,140,.28)');hg.addColorStop(1,'rgba(255,200,140,0)');ctx.fillStyle=hg;ctx.fillRect(0,VY-130,W,260);
+ /* heat shimmer */
+ if(thermal>.05){ctx.globalCompositeOperation='screen';for(let k=0;k<6;k++){const y=VY+40+k*34+Math.sin(tt*2+k)*6;const gg=ctx.createLinearGradient(0,y,0,y+22);gg.addColorStop(0,'rgba(255,120,40,0)');gg.addColorStop(.5,`rgba(255,120,40,${.1*thermal})`);gg.addColorStop(1,'rgba(255,120,40,0)');ctx.fillStyle=gg;ctx.fillRect(0,y,W,22)}
+  ctx.globalCompositeOperation='overlay';ctx.fillStyle=`rgba(255,70,10,${.28*thermal})`;ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over'}
+}
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;cam+=speed*dt;if($('#cv').classList.contains('on'))draw();requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+/* ---------- helpers ---------- */
+function tween(a,b,ms,fn,ez){return new Promise(res=>{const s=performance.now();(function f(t){const p=Math.min(1,(t-s)/ms),e=ez?ez(p):p;fn(a+(b-a)*e);p<1?requestAnimationFrame(f):res()})(s)})}
+const eio=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+function note(t,k=''){const n=$('#note');n.textContent=t;n.className=k}
+function scene(id){$$('.sc').forEach(e=>e.classList.toggle('on',e.id===id));$('#cv').classList.toggle('on',id==='s1')}
+const fmt=v=>Math.round(v).toLocaleString('en-US');
+function hud(m,eh,mw,ej,col){$('#h1').textContent=fmt(m);$('#h2').textContent=eh.toFixed(2)+' EH/s';$('#h3').textContent=mw.toFixed(1)+' MW';$('#h4').textContent=ej?ej.toFixed(1)+' J/TH':'— J/TH';if(col)$('#h4').style.color=col}
+async function main(){
+ speed=0;fan=1;thermal=0;oldOff=0;cam=0;hud(0,0,0,0);$('#cap').classList.remove('on');$('#bg').classList.remove('on');
+ scene('s1');note('Welcome to a Bitcoin mining farm: rows of racks packed with ASICs, machines built to do exactly one thing, hash.');
+ await tween(0,1.1,2600,v=>speed=v,eio);await sleep(1800);
+ note('Each modern ASIC makes about 200 trillion hashes per second and draws about 3.5 kW. Ten thousand of them make 2 EH/s.','warn');
+ await tween(0,1,3200,p=>hud(10000*p,2*p,35*p,p>.2?(p<1?20-p*2.5:17.5):0),eio);hud(10000,2,35,17.5,'#39ff88');await sleep(1600);
+ note('Almost all of that 35 MW ends up as heat, over 800 MWh a day. Thermal view: this is why fans scream and farms chase cheap power and cold climates.','bad');
+ $('#cap').classList.add('on');await tween(0,1,2000,v=>{thermal=v;fan=1+v*1.4});await sleep(3600);
+ note('Electricity is the biggest bill: at $0.04 per kWh this farm burns roughly $33,600 a day. Revenue must beat that.','warn');await sleep(4600);
+ note('Then the halving cuts the block reward in half. Revenue per machine drops overnight…','bad');stage.classList.add('gl');setTimeout(()=>stage.classList.remove('gl'),900);await sleep(3000);
+ $('#cap').textContent='HALVING: OLD MACHINES SHUT OFF';await tween(0,1,3400,v=>{oldOff=v;const m=10000-4300*v;hud(m,2*m/10000,35*m/10000,17.5-0,'#39ff88');$('#h4').textContent=(17.5).toFixed(1)+' J/TH';fan=2.4-v*.5});
+ $('#cap').classList.add('on');await tween(1,0,1200,v=>thermal=v);hud(5700,1.14,19.95,17.5,'#39ff88');
+ note('Miners with older machines (about 34 J/TH) or pricey power go unprofitable and switch off. The efficient ones survive.','good');await sleep(5000);
+ $('#cap').classList.remove('on');scene('s2');$$('.ln').forEach(e=>e.classList.remove('on'));await sleep(500);
+ for(const i of[1,2,3,4]){$('#l'+i).classList.add('on');await sleep(1150)}
+ $('#bg').classList.add('on');await sleep(2800);scene('s0');speed=0;
+}
+(async()=>{while(true){scene('s0');await sleep(3400);await main()}})();
+</script>
+</body>
+</html>
