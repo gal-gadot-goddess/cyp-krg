@@ -206,5 +206,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "Token Approval Drainer.html",
+    "title": "One-Click Token Approval Drainer? 🕳️",
+    "video": "Token Approval Drainer.mp4",
+    "timestamp": "2026-10-31T14:56:01Z",
+    "publish": {
+      "instagram": {
+        "id": "18096492278662278",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1802035777674558",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
