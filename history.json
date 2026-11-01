@@ -229,5 +229,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 42 · DeFi DEX Aggregator Order Routing_ Split Trades, Price Impact and Water-Filling Liquidity Tanks (Explainer Reel.html",
+    "title": "DEX Aggregators: Split Trades to Cut Slippage 💧",
+    "video": "VIZ 42 · DeFi DEX Aggregator Order Routing_ Split Trades, Price Impact and Water-Filling Liquidity Tanks (Explainer Reel.mp4",
+    "timestamp": "2026-11-01T15:34:44Z",
+    "publish": {
+      "instagram": {
+        "id": "18192028840415679",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1065082443215885",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
