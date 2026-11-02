@@ -252,5 +252,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ_14_How_a_DEX_Sets_Prices.html",
+    "title": "⚡ How a DEX Sets Prices (No Order Book!)",
+    "video": "VIZ_14_How_a_DEX_Sets_Prices.mp4",
+    "timestamp": "2026-11-02T18:59:17Z",
+    "publish": {
+      "instagram": {
+        "id": "18105380681335408",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "2310438793142905",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
