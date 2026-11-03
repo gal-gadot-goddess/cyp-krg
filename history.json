@@ -275,5 +275,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 44 · Crypto Hardware Wallet_ Offline Transaction Signing, Secure Element and Malware Blocked (Realistic 3D Device Ex.html",
+    "title": "🛡️ Hardware Wallets: Malware Can’t Steal Your Keys",
+    "video": "VIZ 44 · Crypto Hardware Wallet_ Offline Transaction Signing, Secure Element and Malware Blocked (Realistic 3D Device Ex.mp4",
+    "timestamp": "2026-11-03T16:45:09Z",
+    "publish": {
+      "instagram": {
+        "id": "18141409354627851",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "2586192988564140",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
