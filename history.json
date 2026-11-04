@@ -298,5 +298,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "Lightning Network.html",
+    "title": "⚡ Bitcoin at Lightning Speed: Off-Chain Explained",
+    "video": "Lightning Network.mp4",
+    "timestamp": "2026-11-04T16:42:32Z",
+    "publish": {
+      "instagram": {
+        "id": "17891233101620365",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "989675956897311",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
