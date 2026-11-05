@@ -321,5 +321,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "What an NFT Points To.html",
+    "title": "What Your NFT Really Points To 🧭",
+    "video": "What an NFT Points To.mp4",
+    "timestamp": "2026-11-05T17:30:13Z",
+    "publish": {
+      "instagram": {
+        "id": "18160301323445590",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1150432677928592",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
