@@ -344,5 +344,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 31 · Ethereum Proof of Stake Validator Slashing (Double-Signing Galaxy Explainer Reel).html",
+    "title": "Validator Slashing: Cheat Once, Lose Your Stake ⚠️",
+    "video": "VIZ 31 · Ethereum Proof of Stake Validator Slashing (Double-Signing Galaxy Explainer Reel).mp4",
+    "timestamp": "2026-11-06T16:39:33Z",
+    "publish": {
+      "instagram": {
+        "id": "18135216499822311",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "29399804753042589",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
