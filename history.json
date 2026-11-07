@@ -367,5 +367,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 35 · Ethereum Account Abstraction (ERC-4337) Smart Wallets_ Gas Sponsorship, Batching and Social Recovery (Circuit R.html",
+    "title": "Stop Paying Gas Yourself? ERC-4337 Smart Wallets ⚡",
+    "video": "VIZ 35 · Ethereum Account Abstraction (ERC-4337) Smart Wallets_ Gas Sponsorship, Batching and Social Recovery (Circuit R.mp4",
+    "timestamp": "2026-11-07T15:17:23Z",
+    "publish": {
+      "instagram": {
+        "id": "18121154149990323",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1026301990495785",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
