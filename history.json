@@ -390,5 +390,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "Reentrancy Attack.html",
+    "title": "Reentrancy Attack: 1 Withdraw → 10 Withdrawals 🐍",
+    "video": "Reentrancy Attack.mp4",
+    "timestamp": "2026-11-08T15:41:07Z",
+    "publish": {
+      "instagram": {
+        "id": "17992267329072637",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "2658630554567442",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
