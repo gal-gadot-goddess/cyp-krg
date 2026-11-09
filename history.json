@@ -413,5 +413,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "Bitcoin Halving.html",
+    "title": "⏳ Bitcoin Halving: Scarcity Written Into Code",
+    "video": "Bitcoin Halving.mp4",
+    "timestamp": "2026-11-09T19:21:04Z",
+    "publish": {
+      "instagram": {
+        "id": "17955278352319747",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "29075820408765307",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
