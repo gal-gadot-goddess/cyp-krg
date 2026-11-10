@@ -436,5 +436,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 37 · Bitcoin UTXO Model_ How Transactions Consume Coins, Create Change and Prevent Double Spending (Flow Ribbon Expl.html",
+    "title": "Bitcoin UTXOs: The Secret Behind No-Funds-On-Chain ⚡",
+    "video": "VIZ 37 · Bitcoin UTXO Model_ How Transactions Consume Coins, Create Change and Prevent Double Spending (Flow Ribbon Expl.mp4",
+    "timestamp": "2026-11-10T16:42:09Z",
+    "publish": {
+      "instagram": {
+        "id": "17954997189290694",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "2589737161522254",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
