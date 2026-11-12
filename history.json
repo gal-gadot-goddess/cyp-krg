@@ -459,5 +459,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "51_ Attack.html",
+    "title": "51% Attack Explained: The Secret Chain Erases BTC ⛏️",
+    "video": "51_ Attack.mp4",
+    "timestamp": "2026-11-12T17:14:50Z",
+    "publish": {
+      "instagram": {
+        "id": "18080787677424078",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1607663667186518",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
