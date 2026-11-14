@@ -505,5 +505,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 41 · DeFi Stablecoin CDP Vault_ Collateral Ratio Gauge, Liquidation and Dutch Auction (Speedometer Explainer Reel).html",
+    "title": "Stablecoin Vaults: Collateral Ratio Speedometer ⚡",
+    "video": "VIZ 41 · DeFi Stablecoin CDP Vault_ Collateral Ratio Gauge, Liquidation and Dutch Auction (Speedometer Explainer Reel).mp4",
+    "timestamp": "2026-11-14T15:28:43Z",
+    "publish": {
+      "instagram": {
+        "id": "18080768345720512",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1449609950646737",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
