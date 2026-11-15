@@ -528,5 +528,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "DAO Governance Attack.html",
+    "title": "🗳️ Buy a Vote: How DAOs Get Robbed Overnight",
+    "video": "DAO Governance Attack.mp4",
+    "timestamp": "2026-11-15T15:59:41Z",
+    "publish": {
+      "instagram": {
+        "id": "17874452586641167",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1669525351179650",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
