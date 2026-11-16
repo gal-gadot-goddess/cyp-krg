@@ -551,5 +551,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "Seed Phrase.html",
+    "title": "🗝️ Seed Phrase = Your Wallet’s Master Key (How It’s Stolen)",
+    "video": "Seed Phrase.mp4",
+    "timestamp": "2026-11-16T19:02:40Z",
+    "publish": {
+      "instagram": {
+        "id": "17957123943340408",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "2220165942228793",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
