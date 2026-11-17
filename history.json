@@ -574,5 +574,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 32 · Ethereum Data Availability Sampling with Erasure Coding and Blobs (Laser Matrix Explainer Reel).html",
+    "title": "🧠 Ethereum DA Sampling: Trust the Whole Block ⚡",
+    "video": "VIZ 32 · Ethereum Data Availability Sampling with Erasure Coding and Blobs (Laser Matrix Explainer Reel).mp4",
+    "timestamp": "2026-11-17T18:00:48Z",
+    "publish": {
+      "instagram": {
+        "id": "18005138819807044",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1143542028606035",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
