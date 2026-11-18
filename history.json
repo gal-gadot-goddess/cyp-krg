@@ -597,5 +597,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ_11_Exchange_vs_Self_Custody.html",
+    "title": "🧊 Exchange vs Self-Custody: Who Can Freeze Your Funds?",
+    "video": "VIZ_11_Exchange_vs_Self_Custody.mp4",
+    "timestamp": "2026-11-18T17:42:02Z",
+    "publish": {
+      "instagram": {
+        "id": "18578354641077872",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1943126690392818",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
