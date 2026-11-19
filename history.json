@@ -620,5 +620,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ_17_Sandwich_Attack.html",
+    "title": "🥪 Sandwich Attacks: How Bots Hijack Your DEX Swap",
+    "video": "VIZ_17_Sandwich_Attack.mp4",
+    "timestamp": "2026-11-19T17:50:40Z",
+    "publish": {
+      "instagram": {
+        "id": "18107988884372564",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1860231901794151",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
