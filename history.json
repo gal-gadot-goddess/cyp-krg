@@ -666,5 +666,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "Optimistic Rollup Fraud Proof.html",
+    "title": "🕵️‍♂️ Optimistic Rollups: Fraud Proofs Catch the Lie",
+    "video": "Optimistic Rollup Fraud Proof.mp4",
+    "timestamp": "2026-11-21T16:31:06Z",
+    "publish": {
+      "instagram": {
+        "id": "18132227011872552",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1161540623024184",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
