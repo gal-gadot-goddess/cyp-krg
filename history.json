@@ -689,5 +689,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ 33 · Ethereum MEV-Boost and Proposer-Builder Separation (Block Auction Towers Explainer Reel).html",
+    "title": "MEV-Boost Explained: Block Auction Towers 🗼",
+    "video": "VIZ 33 · Ethereum MEV-Boost and Proposer-Builder Separation (Block Auction Towers Explainer Reel).mp4",
+    "timestamp": "2026-11-22T16:51:25Z",
+    "publish": {
+      "instagram": {
+        "status": "failed",
+        "platform": "instagram",
+        "error": "Media publish failed: {'error': {'message': 'Media ID is not available', 'code': 9007, 'type': 'OAuthException', 'error_subcode': 2207027, 'is_transient': False, 'error_user_msg': 'The media is not ready for publishing, please wait for a moment', 'error_user_title': 'Cannot Publish', 'fbtrace_id': 'AHFlMQLmjthxeRKB4L9fKob'}}"
+      },
+      "facebook": {
+        "id": "1679631496865400",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
