@@ -712,5 +712,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "viz43-bitcoin-mining-farm-asic-racks-hashrate-heat-electricity-and-halving-survival-cinematic-walkthrough-explainer-reel.html",
+    "title": "Bitcoin Mining Farm: Heat, Power & Halving Survival 🔥⚡",
+    "video": "viz43-bitcoin-mining-farm-asic-racks-hashrate-heat-electricity-and-halving-survival-cinematic-walkthrough-explainer-reel.mp4",
+    "timestamp": "2026-11-23T20:44:48Z",
+    "publish": {
+      "instagram": {
+        "id": "17979422346170395",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1135061325950162",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
