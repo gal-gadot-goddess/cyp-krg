@@ -735,5 +735,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "VIZ_13_Flash_Loan.html",
+    "title": "⚡ Flash Loans: Borrow $10M in One Transaction (No Collateral)",
+    "video": "VIZ_13_Flash_Loan.mp4",
+    "timestamp": "2026-11-24T19:49:24Z",
+    "publish": {
+      "instagram": {
+        "id": "18036784604887363",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1706217977840766",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
