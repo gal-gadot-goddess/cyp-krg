@@ -758,5 +758,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "viz41-defi-stablecoin-cdp-vault-collateral-ratio-gauge-liquidation-and-dutch-auction-speedometer-explainer-reel.html",
+    "title": "🧠 CDP Vault Crash Course: Ratio Gauge → Liquidation ⚡",
+    "video": "viz41-defi-stablecoin-cdp-vault-collateral-ratio-gauge-liquidation-and-dutch-auction-speedometer-explainer-reel.mp4",
+    "timestamp": "2026-11-25T18:58:47Z",
+    "publish": {
+      "instagram": {
+        "id": "18127942942929461",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1698102955002337",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
