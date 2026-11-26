@@ -781,5 +781,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "Ethereum Fee Burn.html",
+    "title": "🔥 Ethereum Fee Burn: Where Gas Goes Forever (EIP-1559)",
+    "video": "Ethereum Fee Burn.mp4",
+    "timestamp": "2026-11-26T18:45:12Z",
+    "publish": {
+      "instagram": {
+        "id": "18341365702274256",
+        "platform": "instagram",
+        "status": "success"
+      },
+      "facebook": {
+        "id": "1154307640299276",
+        "page": "CryptoKregg",
+        "status": "success"
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
