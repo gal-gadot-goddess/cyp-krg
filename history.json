@@ -804,5 +804,28 @@
         "platform": "threads"
       }
     }
+  },
+  {
+    "file": "Proof of Work.html",
+    "title": "Proof of Work Explained: How Miners Win the Hash Race ⚙️",
+    "video": "Proof of Work.mp4",
+    "timestamp": "2026-11-27T18:35:17Z",
+    "publish": {
+      "instagram": {
+        "status": "failed",
+        "platform": "instagram",
+        "error": "Container creation failed with URL: {\"error\":{\"message\":\"Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons.\",\"code\":190,\"type\":\"OAuthException\",\"error_subcode\":460,\"fbtrace_id\":\"AKiJWQepBOH-_m7CoRRyqHM\"}}"
+      },
+      "facebook": {
+        "status": "failed",
+        "page": "CryptoKregg",
+        "error": "Error validating access token: The session has been invalidated because the user changed their password or Facebook has changed the session for security reasons."
+      },
+      "threads": {
+        "status": "skipped",
+        "reason": "Missing credentials",
+        "platform": "threads"
+      }
+    }
   }
 ]
